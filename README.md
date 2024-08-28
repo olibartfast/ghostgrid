@@ -1,5 +1,10 @@
-
+Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
 ### Some benchmarks sites
 * https://github.com/facebookresearch/unibench
 * https://mmmu-benchmark.github.io/
+
+### Online courses
+https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
+https://www.deeplearning.ai/short-courses/large-multimodal-model-prompting-with-gemini/
+
