@@ -5,6 +5,6 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://mmmu-benchmark.github.io/
 
 ### Online courses
-https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
-https://www.deeplearning.ai/short-courses/large-multimodal-model-prompting-with-gemini/
+* https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
+* https://www.deeplearning.ai/short-courses/large-multimodal-model-prompting-with-gemini/
 
