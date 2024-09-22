@@ -57,3 +57,5 @@ export OPENAI_API_KEY="your_openai_api_key"
 - Output will display the API's JSON response.
 
 
+### Reference
+* https://platform.openai.com/docs/guides/vision
