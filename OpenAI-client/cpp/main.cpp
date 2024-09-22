@@ -19,6 +19,12 @@ std::string get_api_key() {
     return std::string(api_key);
 }
 
+// Function to check if the string is a URL
+bool is_url(const std::string& image_path) {
+    return image_path.rfind("http://", 0) == 0 || image_path.rfind("https://", 0) == 0;
+}
+
+
 // Function to encode the image
 std::string encode_image(const std::string& image_path) {
     std::ifstream image_file(image_path, std::ios::binary);
@@ -91,16 +97,29 @@ int main(int argc, char* argv[]) {
             {"text", prompt}
         });
 
-        // Add images
+        // Add images (distinguish between URLs and local files)
         for (const auto& image_path : image_paths) {
-            std::string base64_image = encode_image(image_path);
-            json image_content = {
-                {"type", "image_url"},
-                {"image_url", {
-                    {"url", "data:image/jpeg;base64," + base64_image},
-                    {"detail", detail}
-                }}
-            };
+            json image_content;
+            if (is_url(image_path)) {
+                // If it's a URL, use it directly
+                image_content = {
+                    {"type", "image_url"},
+                    {"image_url", {
+                        {"url", image_path},
+                        {"detail", detail}
+                    }}
+                };
+            } else {
+                // If it's a local file, encode it as base64
+                std::string base64_image = encode_image(image_path);
+                image_content = {
+                    {"type", "image_url"},
+                    {"image_url", {
+                        {"url", "data:image/jpeg;base64," + base64_image},
+                        {"detail", detail}
+                    }}
+                };
+            }
             payload["messages"][0]["content"].push_back(image_content);
         }
 

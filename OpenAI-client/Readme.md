@@ -4,7 +4,7 @@ This tool allows you to analyze images using OpenAI's API, providing prompts and
 
 ## Features
 
-- Supports multiple image inputs (local files)
+- Supports multiple image inputs (local files or url)
 - Configurable text prompts
 - Model and API endpoint specification
 - CLI parameters for detailed image analysis (detail levels)
