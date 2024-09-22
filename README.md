@@ -1,5 +1,7 @@
 Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
+[OpenAI API c++ inference client](OpenAI-client/Readme.md)
+
 ### Some benchmarks sites
 * https://github.com/facebookresearch/unibench
 * https://mmmu-benchmark.github.io/
