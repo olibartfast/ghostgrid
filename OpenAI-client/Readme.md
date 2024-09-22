@@ -1,4 +1,4 @@
-# OpenAI Image Analysis CLI Tool
+# OpenAI C++ Multimodal Inference Client
 
 This tool allows you to analyze images using OpenAI's API, providing prompts and image files via the command line. It can handle both URLs and local image files, which are encoded as base64 before being sent to the API.
 
