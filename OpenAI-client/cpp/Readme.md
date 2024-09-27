@@ -1,6 +1,6 @@
 # OpenAI API-compliant C++ multimodal inference client
 
-This tool enables multimodal prompts (text and images) using OpenAI's API, allowing users to submit both text inputs and image files directly from the command line. It supports image inputs via URLs or local files, which are automatically encoded as base64 before being sent to the API for processing. Additionally, it is compatible with any LLM framework that allows serving models via an OpenAI-compatible server, such as vLLM.
+This project enables multimodal prompts (text and images) using OpenAI's API, allowing users to submit both text inputs and image files directly from the command line. It supports image inputs via URLs or local files, which are automatically encoded as base64 before being sent to the API for processing. Additionally, it is compatible with any LLM framework that allows serving models via an OpenAI-compatible server, such as vLLM.
 
 ## Features
 
