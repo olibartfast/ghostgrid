@@ -23,7 +23,7 @@ pip install requests
 
 ## Getting Started
 
-### 1. Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/olibartfast/vision-language-models-playground.git
@@ -31,7 +31,7 @@ cd vision-language-models-playground/OpenAI-client/python
 ```
 
 
-### 3. Run the Script
+### Run the Script
 
 You can run the script using the following command:
 
