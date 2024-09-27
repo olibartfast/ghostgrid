@@ -1,4 +1,4 @@
-# Image Analysis using OpenAI API
+# OpenAI API-compliant Python multimodal inference client
 
 This project provides a Python-based script to analyze images using OpenAI's API. It supports image files or URLs as input and generates a response based on a text prompt using the GPT model. The script encodes local images in Base64 format or accepts image URLs directly.
 
