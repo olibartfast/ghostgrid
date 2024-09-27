@@ -37,7 +37,7 @@ cd vision-language-models-playground/OpenAI-client/python
 You can run the script using the following command:
 
 ```bash
-python image_analysis.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model openai_model_name --tokens max_token_output
+python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model openai_model_name --tokens max_token_output
 ```
 
 **Arguments:**
