@@ -54,7 +54,7 @@ python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model
 Analyze an image using the script:
 
 ```bash
-python image_analysis.py -p "Describe this image" -i image.jpg -m gpt-4o-mini -t 300
+python main.py -p "Describe this image" -i image.jpg -m gpt-4o-mini -t 300
 ```
 
 ### Environment Variables
