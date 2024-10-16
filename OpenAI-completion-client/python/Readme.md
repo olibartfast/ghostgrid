@@ -1,13 +1,14 @@
-# Image Analysis using OpenAI API
+# OpenAI API-compliant Python multimodal inference client
 
-This project provides a Python-based script to analyze images using OpenAI's API. It supports image files or URLs as input and generates a response based on a text prompt using the GPT model. The script encodes local images in Base64 format or accepts image URLs directly.
+This project enables multimodal prompts (text and images) using OpenAI's API, allowing users to submit both text inputs and image files directly from the command line. It supports image inputs via URLs or local files, which are automatically encoded as base64 before being sent to the API for processing. Additionally, it is compatible with any LLM framework that allows serving models via an OpenAI-compatible server, such as vLLM.
 
 ## Features
 
-- Supports local image files or URLs.
-- Sends text prompts alongside images for analysis.
-- Leverages OpenAI's API to generate detailed responses.
-- Configurable prompt, model, token count, and detail level.
+- Supports multiple image inputs (local files or url)
+- Configurable text prompts
+- Model and API endpoint specification
+- CLI parameters for detailed image analysis (detail levels)
+- Automatically reads OpenAI API key from the environment
 
 ## Prerequisites
 
@@ -23,7 +24,7 @@ pip install requests
 
 ## Getting Started
 
-### 1. Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/olibartfast/vision-language-models-playground.git
@@ -31,12 +32,12 @@ cd vision-language-models-playground/OpenAI-client/python
 ```
 
 
-### 3. Run the Script
+### Run the Script
 
 You can run the script using the following command:
 
 ```bash
-python image_analysis.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model openai_model_name --tokens max_token_output
+python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model openai_model_name --tokens max_token_output
 ```
 
 **Arguments:**
