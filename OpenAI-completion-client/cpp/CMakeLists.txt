@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(OpenAIImageAnalysis)
+project(openai-completion-client)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -37,10 +37,10 @@ FetchContent_MakeAvailable(cxxopts)
 message(STATUS "cxxopts_SOURCE_DIR: ${cxxopts_SOURCE_DIR}")
 
 # Add the executable
-add_executable(openai_image_analysis main.cpp ${cpp_base64_SOURCE_DIR}/base64.cpp)
+add_executable(${PROJECT_NAME} main.cpp ${cpp_base64_SOURCE_DIR}/base64.cpp)
 
 # Link libraries
-target_link_libraries(openai_image_analysis 
+target_link_libraries(${PROJECT_NAME} 
   PRIVATE 
     CURL::libcurl
     OpenSSL::SSL
@@ -48,7 +48,7 @@ target_link_libraries(openai_image_analysis
 )
 
 # Include directories
-target_include_directories(openai_image_analysis 
+target_include_directories(${PROJECT_NAME} 
   PRIVATE 
   ${cpp_base64_SOURCE_DIR}
   ${nlohmann_json_SOURCE_DIR}

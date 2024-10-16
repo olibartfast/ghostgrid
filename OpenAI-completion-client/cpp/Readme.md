@@ -33,7 +33,7 @@ This tool enables multimodal prompts (text and images) using OpenAI's API, allow
 ### Example Command
 
 ```bash
-./openai_image_analysis \
+./openai-completion-client \
     --prompt "Analyze these images for content differences" \
     --images image1.jpg image2.jpg \
     --model gpt-4o-mini \

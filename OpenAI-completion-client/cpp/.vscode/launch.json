@@ -6,7 +6,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C++ Launch",
+            "name": "openai",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/openai_image_analysis",
