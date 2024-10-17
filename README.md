@@ -1,6 +1,7 @@
 Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
 ### OpenAI API-compliant C++ multimodal inference client:
+* TODO Image Resize
 * [C++ code](OpenAI-completion-client/cpp/Readme.md)
 * [Python code](OpenAI-completion-client/python/Readme.md)
 

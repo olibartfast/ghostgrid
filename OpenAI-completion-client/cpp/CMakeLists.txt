@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Find required packages
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(OpenCV REQUIRED)  # Add OpenCV
 
 # Add nlohmann_json
 include(FetchContent)
@@ -45,12 +46,14 @@ target_link_libraries(${PROJECT_NAME}
     CURL::libcurl
     OpenSSL::SSL
     OpenSSL::Crypto
+    ${OpenCV_LIBS}  # Link OpenCV
 )
 
 # Include directories
 target_include_directories(${PROJECT_NAME} 
   PRIVATE 
-  ${cpp_base64_SOURCE_DIR}
-  ${nlohmann_json_SOURCE_DIR}
-  ${cxxopts_SOURCE_DIR}/include
+    ${cpp_base64_SOURCE_DIR}
+    ${nlohmann_json_SOURCE_DIR}
+    ${cxxopts_SOURCE_DIR}/include
+    ${OpenCV_INCLUDE_DIRS}  # Include OpenCV headers
 )

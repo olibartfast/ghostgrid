@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 #include "base64.h"
 #include <cxxopts.hpp>
+#include <opencv2/opencv.hpp>
 
 using json = nlohmann::json;
 
@@ -29,7 +30,9 @@ std::tuple<std::string, std::string> get_api_key_and_endpoint(const std::string&
         return std::make_tuple(std::string(api_key), std::string(api_endpoint));
     }
     else if (provider == "vllm") {
-        return std::make_tuple("token123", std::string("http://") + local_ip + ":8080/v1/chat/completions");
+        const char* api_key = std::getenv("VLLM_API_KEY");
+        const char* api_endpoint = std::getenv("VLLM_ENDPOINT");        
+        return std::make_tuple(std::string(api_key), std::string(api_endpoint));
     }
     else {
         throw std::runtime_error("Invalid provider");
@@ -44,15 +47,48 @@ bool is_url(const std::string& image_path) {
 
 
 // Function to encode the image
-std::string encode_image(const std::string& image_path) {
-    std::ifstream image_file(image_path, std::ios::binary);
-    if (!image_file) {
+
+std::string encode_image(const std::string& image_path, int target_size) {
+    // Read the image using OpenCV
+    cv::Mat image = cv::imread(image_path, cv::IMREAD_COLOR);
+    if (image.empty()) {
         throw std::runtime_error("Unable to open image file: " + image_path);
     }
-    std::vector<unsigned char> image_data((std::istreambuf_iterator<char>(image_file)), std::istreambuf_iterator<char>());
-    // resize image before encoding
-    
-    return base64_encode(image_data.data(), image_data.size());
+
+    // Calculate the aspect ratio and resize the image while maintaining the aspect ratio
+    int original_width = image.cols;
+    int original_height = image.rows;
+    float aspect_ratio = (float)original_width / (float)original_height;
+
+    int new_width, new_height;
+    if (aspect_ratio >= 1.0f) {
+        // Width is greater than or equal to height, so scale based on width
+        new_width = target_size;
+        new_height = static_cast<int>(target_size / aspect_ratio);
+    } else {
+        // Height is greater than width, so scale based on height
+        new_height = target_size;
+        new_width = static_cast<int>(target_size * aspect_ratio);
+    }
+
+    cv::Mat resized_image;
+    cv::resize(image, resized_image, cv::Size(new_width, new_height));
+
+    // Create a square canvas (target_size x target_size) and place the resized image in the center
+    int top = (target_size - new_height) / 2;
+    int bottom = target_size - new_height - top;
+    int left = (target_size - new_width) / 2;
+    int right = target_size - new_width - left;
+
+    cv::Mat squared_image;
+    cv::copyMakeBorder(resized_image, squared_image, top, bottom, left, right, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));  // Padding with black color
+
+    // Convert the square image to a vector of unsigned chars (binary data)
+    std::vector<unsigned char> buf;
+    cv::imencode(".jpg", squared_image, buf);  // Encode as JPG (or PNG if needed)
+
+    // Encode the image data as base64
+    return base64_encode(buf.data(), buf.size());
 }
 
 // Callback function for CURL
@@ -78,6 +114,7 @@ int main(int argc, char* argv[]) {
             ("r,provider", "API provider", cxxopts::value<std::string>())  
             ("d,detail", "Image detail level (auto, low, high)", cxxopts::value<std::string>()->default_value("low"))
             ("t,tokens", "Max tokens for response", cxxopts::value<int>()->default_value("300"))
+            ("s,size", "Image size for encoding", cxxopts::value<int>()->default_value("512"))
             ("h,help", "Print usage")
         ;
         options.parse_positional({"images"});
@@ -96,6 +133,7 @@ int main(int argc, char* argv[]) {
         std::string detail = result["detail"].as<std::string>();
         int max_tokens = result["tokens"].as<int>();
         std::string provider = result["provider"].as<std::string>();
+        int target_size = result["size"].as<int>();
 
         // Get the API key/endpoint from environment variable
         const auto [api_key, api_endpoint] = get_api_key_and_endpoint(provider,url);
@@ -132,7 +170,7 @@ int main(int argc, char* argv[]) {
                 };
             } else {
                 // If it's a local file, encode it as base64
-                std::string base64_image = encode_image(image_path);
+                std::string base64_image = encode_image(image_path, target_size);
                 image_content = {
                     {"type", "image_url"},
                     {"image_url", {

@@ -1,34 +1,37 @@
-# OpenAI API-compliant C++ multimodal inference client
+# OpenAI API-Compliant C++ Multimodal Inference Client
 
-This project enables multimodal prompts (text and images) using OpenAI's API, allowing users to submit both text inputs and image files directly from the command line. It supports image inputs via URLs or local files, which are automatically encoded as base64 before being sent to the API for processing. Additionally, it is compatible with any LLM framework that allows serving models via an OpenAI-compatible server, such as vLLM.
+This project provides a command-line interface (CLI) tool that allows users to send multimodal prompts (text and images) to OpenAI's API. The tool can process text inputs alongside image files, either from local storage or URLs, encoding local images as base64 before transmitting them. It supports any language model (LLM) framework compatible with OpenAI's API, such as **vLLM**.
 
 ## Features
 
-- Supports multiple image inputs (local files or url)
-- Configurable text prompts
-- Model and API endpoint specification
-- CLI parameters for detailed image analysis (detail levels)
-- Automatically reads OpenAI API key from the environment
-
+- **Multimodal Support**: Submit text and multiple images (from URLs or local files).
+- **Customizable Prompts**: Input custom text prompts for image analysis.
+- **API Flexibility**: Compatible with multiple API providers (OpenAI, Together, vLLM).
+- **Detailed Image Analysis**: Set desired detail levels (`low`, `auto`, `high`).
+- **Environment Variable Integration**: Automatically reads API keys and endpoints from environment variables.
+  
 ## Requirements
 
 - **C++17 or later**
-- **CURL**: For making HTTP requests.
-- **nlohmann/json**: For JSON parsing and serialization.
-- **cxxopts**: For parsing command line options.
-- **Rene Nyffenegger's Base64 Library**: For base64 encoding of local images.
+- **CURL**: For handling HTTP requests.
+- **nlohmann/json**: For JSON serialization and deserialization.
+- **cxxopts**: For parsing command-line options.
+- **OpenCV**: For image processing and resizing.
+- **Rene Nyffenegger's Base64 Library**: For encoding image data as base64.
 
 ## Usage
 
-### Command-line Parameters
+### Command-Line Parameters
 
-- `--prompt, -p`: Text prompt for image analysis.
-- `--images, -i`: Paths to local image files (multiple images supported).
+- `--prompt, -p`: The text prompt for image analysis.
+- `--images, -i`: Paths to local image files (multiple files supported).
 - `--model, -m`: OpenAI model name (default: `gpt-4o-mini`).
 - `--url, -u`: OpenAI API endpoint URL (default: `https://api.openai.com/v1/chat/completions`).
 - `--detail, -d`: Image detail level (`auto`, `low`, `high`; default: `low`).
-- `--tokens, -t`: Maximum tokens for the response (default: 300).
-- `--help, -h`: Print usage information.
+- `--tokens, -t`: Maximum tokens for the API response (default: 300).
+- `--provider, -r`: API provider name (e.g., `openai`, `together`, `vllm`).
+- `--size, -s`: Image size for encoding (default: 512 pixels).
+- `--help, -h`: Display help information.
 
 ### Example Command
 
@@ -44,18 +47,14 @@ This project enables multimodal prompts (text and images) using OpenAI's API, al
 
 ### Environment Variables
 
-- **OPENAI_API_KEY**: The API key for OpenAI must be set as an environment variable.
+- **OPENAI_API_KEY**: The API key for OpenAI.
+- **TOGETHER_API_KEY**: The API key for Together AI.
+- **OPENAI_ENDPOINT**: Custom endpoint URL (optional for OpenAI users).
+- **TOGETHER_ENDPOINT**: Endpoint URL for Together AI users.
 
-Example:
+Example setup:
+
 ```bash
 export OPENAI_API_KEY="your_openai_api_key"
 ```
 
-### Notes
-
-- The program automatically encodes local images as base64 before sending them in the request.
-- Output will display the API's JSON response.
-
-
-### Reference
-* https://platform.openai.com/docs/guides/vision
