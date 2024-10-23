@@ -71,6 +71,7 @@ Basic command structure:
     --images image1.jpg image2.jpg \
     --model gpt-4o \
     --api_endpoint https://api.openai.com/v1/chat/completions \
+    --api_key_env OPENAI_API_KEY \
     --detail low \
     --tokens 100
 ```
