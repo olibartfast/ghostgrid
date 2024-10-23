@@ -1,60 +1,84 @@
-# OpenAI API-Compliant C++ Multimodal Inference Client
+# OpenAI Completion Client
 
-This project provides a command-line interface (CLI) tool that allows users to send multimodal prompts (text and images) to OpenAI's API. The tool can process text inputs alongside image files, either from local storage or URLs, encoding local images as base64 before transmitting them. It supports any language model (LLM) framework compatible with OpenAI's API, such as **vLLM**.
+A C++ command-line interface (CLI) tool for sending multimodal prompts (text and images) to Large Language Model (LLM) APIs compatible with OpenAI's chat completions format. The tool supports multiple API providers and can handle both local images and image URLs in prompts.
 
-## Features
+## Key Features
 
-- **Multimodal Support**: Submit text and multiple images (from URLs or local files).
-- **Customizable Prompts**: Input custom text prompts for image analysis.
-- **API Flexibility**: Compatible with multiple API providers (OpenAI, Together, vLLM).
-- **Detailed Image Analysis**: Set desired detail levels (`low`, `auto`, `high`).
-- **Environment Variable Integration**: Automatically reads API keys and endpoints from environment variables.
-  
-## Requirements
+- **Multiple API Provider Support**: Compatible with various providers including:
+  - OpenAI
+  - Together
+  - vLLM
+  - Anthropic
+  - Google
+- **Multimodal Capabilities**: 
+  - Submit text alongside multiple images
+  - Support for both local image files and image URLs
+  - Automatic image preprocessing (resizing while maintaining aspect ratio)
+- **Image Processing Options**:
+  - Customizable target image size
+  - Multiple detail levels for image analysis (low, auto, high)
+  - Automatic square padding for non-square images
+- **API Configuration**:
+  - Environment variable integration for API keys and endpoints
+  - Custom endpoint URL support
+  - Configurable maximum token limit for responses
 
-- **C++17 or later**
-- **CURL**: For handling HTTP requests.
-- **nlohmann/json**: For JSON serialization and deserialization.
-- **cxxopts**: For parsing command-line options.
-- **OpenCV**: For image processing and resizing.
-- **Rene Nyffenegger's Base64 Library**: For encoding image data as base64.
+## Dependencies
+
+- C++17 or later
+- CURL (for HTTP requests)
+- nlohmann/json (JSON handling)
+- cxxopts (command-line argument parsing)
+- OpenCV (image processing)
+- base64.h (Base64 encoding)
+
+## Environment Variables
+
+Set up your API credentials using environment variables and pass it as cli input.
 
 ## Usage
 
-### Command-Line Parameters
-
-- `--prompt, -p`: The text prompt for image analysis.
-- `--images, -i`: Paths to local image files (multiple files supported).
-- `--model, -m`: OpenAI model name (default: `gpt-4o-mini`).
-- `--url, -u`: OpenAI API endpoint URL (default: `https://api.openai.com/v1/chat/completions`).
-- `--detail, -d`: Image detail level (`auto`, `low`, `high`; default: `low`).
-- `--tokens, -t`: Maximum tokens for the API response (default: 300).
-- `--provider, -r`: API provider name (e.g., `openai`, `together`, `vllm`).
-- `--size, -s`: Image size for encoding (default: 512 pixels).
-- `--help, -h`: Display help information.
-
-### Example Command
+Basic command structure:
 
 ```bash
 ./openai-completion-client \
-    --prompt "Analyze these images for content differences" \
-    --images image1.jpg image2.jpg \
-    --model gpt-4o-mini \
-    --url https://api.openai.com/v1/chat/completions \
-    --detail high \
-    --tokens 300
+    --prompt <text_prompt> \
+    --images <image_paths...> \
+    --model <model_name> \
+    --api_endpoint <api_provider_endpoint>
+    --api_key_env <api_provider_key_env_var> \
+    [optional parameters]
 ```
 
-### Environment Variables
+### Command Line Options
 
-- **OPENAI_API_KEY**: The API key for OpenAI.
-- **TOGETHER_API_KEY**: The API key for Together AI.
-- **OPENAI_ENDPOINT**: Custom endpoint URL (optional for OpenAI users).
-- **TOGETHER_ENDPOINT**: Endpoint URL for Together AI users.
+- `-p, --prompt`: Text prompt for image analysis
+- `-i, --images`: One or more image file paths or URLs
+- `-m, --model`: Model name to use (depending on api provider e.g., gpt-4o, claude3.5, lama3.2-90b vision...)
+- `-e, --api_endpoint`: API endpoint URL (depends from provider) 
+- `-a  --api_key_env ` : API key to read via environment variable, 
+- `-d, --detail`: Image detail level (low, auto, high) [default: low]
+- `-t, --tokens`: Maximum tokens for response [default: 300]
+- `-s, --size`: Target image size for encoding [default: 512]
+- `-h, --help`: Print usage information
 
-Example setup:
+### Example Commands
 
+1. Analyze local images:
 ```bash
-export OPENAI_API_KEY="your_openai_api_key"
+./openai-completion-client \
+    --prompt "Compare these images" \
+    --images image1.jpg image2.jpg \
+    --model gpt-4o \
+    --api_endpoint https://api.openai.com/v1/chat/completions \
+    --detail low \
+    --tokens 100
 ```
+
+## Image Processing Details
+
+- Images are automatically resized to maintain aspect ratio
+- Non-square images are padded with black borders to create square output
+- Final images are encoded as base64 JPEG before API submission
+- URLs are passed directly to the API without modification
 

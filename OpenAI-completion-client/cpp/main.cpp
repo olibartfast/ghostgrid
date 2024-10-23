@@ -11,34 +11,15 @@
 
 using json = nlohmann::json;
 
-// Function to get the OpenAI API Key from environment variable
-std::tuple<std::string, std::string> get_api_key_and_endpoint(const std::string& provider, const std::string& local_ip = "localhost") {
-    if (provider == "together") {
-        const char* api_key = std::getenv("TOGETHER_API_KEY");
-        const char* api_endpoint = std::getenv("TOGETHER_ENDPOINT");
-        if (api_key == nullptr || api_endpoint == nullptr) {
-            throw std::runtime_error("TOGETHER_API_KEY or TOGETHER_ENDPOINT environment variable not set");
-        }
-        return std::make_tuple(std::string(api_key), std::string(api_endpoint));
-    }
-    else if (provider == "openai") {
-        const char* api_key = std::getenv("OPENAI_API_KEY");
-        const char* api_endpoint = std::getenv("OPENAI_ENDPOINT");
-        if (api_key == nullptr || api_endpoint == nullptr) {
-            throw std::runtime_error("OPENAI_API_KEY or OPENAI_ENDPOINT environment variable not set");
-        }
-        return std::make_tuple(std::string(api_key), std::string(api_endpoint));
-    }
-    else if (provider == "vllm") {
-        const char* api_key = std::getenv("VLLM_API_KEY");
-        const char* api_endpoint = std::getenv("VLLM_ENDPOINT");        
-        return std::make_tuple(std::string(api_key), std::string(api_endpoint));
-    }
-    else {
-        throw std::runtime_error("Invalid provider");
-    }
-}
 
+std::string get_api_key(const std::string& api_key_env) {
+
+    const char* api_key = std::getenv(api_key_env.c_str());
+    if (api_key == nullptr) 
+        throw std::runtime_error(std::string(api_key_env) + " environment variable not set");
+
+    return std::string(api_key);
+}
 
 // Function to check if the string is a URL
 bool is_url(const std::string& image_path) {
@@ -108,10 +89,11 @@ int main(int argc, char* argv[]) {
         cxxopts::Options options("OpenAI client completion", "Test vlm/llm models using OpenAI's API");
         options.add_options()
             ("p,prompt", "Text prompt for image analysis", cxxopts::value<std::string>())
+            ("a,api_key_env", "API key environment variable", cxxopts::value<std::string>())
             ("i,images", "Image file paths", cxxopts::value<std::vector<std::string>>())
-            ("m,model", "Model name", cxxopts::value<std::string>())
-            ("u,url", "API endpoint URL", cxxopts::value<std::string>()->default_value(""))
-            ("r,provider", "API provider", cxxopts::value<std::string>())  
+            ("m,model", "Model name", cxxopts::value<std::string>()->default_value(""))
+            ("e,api_endpoint", "API endpoint URL", cxxopts::value<std::string>())
+            ("r,provider", "API provider", cxxopts::value<std::string>()->default_value(""))  
             ("d,detail", "Image detail level (auto, low, high)", cxxopts::value<std::string>()->default_value("low"))
             ("t,tokens", "Max tokens for response", cxxopts::value<int>()->default_value("300"))
             ("s,size", "Image size for encoding", cxxopts::value<int>()->default_value("512"))
@@ -125,18 +107,18 @@ int main(int argc, char* argv[]) {
             std::cout << options.help() << std::endl;
             return 0;
         }
-
+        std::string API_KEY_ENV = result["api_key_env"].as<std::string>();
         std::string prompt = result["prompt"].as<std::string>();
         std::vector<std::string> image_paths = result["images"].as<std::vector<std::string>>();
         std::string model = result["model"].as<std::string>();
-        std::string url = result["url"].as<std::string>();
+        std::string api_endpoint = result["api_endpoint"].as<std::string>();
         std::string detail = result["detail"].as<std::string>();
         int max_tokens = result["tokens"].as<int>();
         std::string provider = result["provider"].as<std::string>();
         int target_size = result["size"].as<int>();
 
         // Get the API key/endpoint from environment variable
-        const auto [api_key, api_endpoint] = get_api_key_and_endpoint(provider,url);
+        std::string api_key = get_api_key(API_KEY_ENV);
 
         // Prepare JSON payload
         json payload = {
