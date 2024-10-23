@@ -1,14 +1,14 @@
 Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
 ### OpenAI API-compliant C++ multimodal inference client:
-* TODO Image Resize
 * [C++ code](OpenAI-completion-client/cpp/Readme.md)
-* [Python code](OpenAI-completion-client/python/Readme.md)
+* [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
 
 ### Some benchmarks sites
 * https://mmmu-benchmark.github.io/
 * https://lmarena.ai/
 * https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard
+* https://huggingface.co/spaces/opencompass/openvlm_video_leaderboard
 
 ### Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
