@@ -10,15 +10,11 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/openai-completion-client",
-            "args": ["-p", "Describe the contents of this image", "${workspaceFolder}/512.jpg", "-r", "together", "-m", "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo"],
+            "args": ["-p", "Describe the contents of this image", "2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+             "-e", "https://api.together.xyz/v1/chat/completions", "-m", "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo", "-a", "TOGETHER_API_KEY"],
             "environment": [
                 { "name": "config", "value": "Debug" },
-                { "name": "OPENAI_API_KEY", "value": "" },
-                { "name": "OPENAI_ENDPOINT", "value": "https://api.openai.com/v1/chat/completions" },
-                { "name": "TOGETHER_API_KEY", "value": "" },
-                { "name": "TOGETHER_ENDPOINT", "value": "https://api.together.xyz/v1/chat/completions"},
-                { "name": "VLLM_API_KEY", "value": "token123" },
-                { "name": "VLLM_ENDPOINT", "value": "https://localhost:8080/v1/chat/completions"}
+                { "name": "TOGETHER_API_KEY", "value": "" }
             ],
             "cwd": "${workspaceFolder}"
         }
