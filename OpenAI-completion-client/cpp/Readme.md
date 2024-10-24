@@ -8,8 +8,6 @@ A C++ command-line interface (CLI) tool for sending multimodal prompts (text and
   - OpenAI
   - Together
   - vLLM
-  - Anthropic
-  - Google
 - **Multimodal Capabilities**: 
   - Submit text alongside multiple images
   - Support for both local image files and image URLs
