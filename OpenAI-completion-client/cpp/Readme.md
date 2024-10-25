@@ -28,7 +28,7 @@ A C++ command-line interface (CLI) tool for sending multimodal prompts (text and
 - nlohmann/json (JSON handling)
 - cxxopts (command-line argument parsing)
 - OpenCV (image processing)
-- base64.h (Base64 encoding)
+- Rene Nyffenegger's Base64 Library for encoding image data as base64 (Base64 encoding)
 
 ## Environment Variables
 
