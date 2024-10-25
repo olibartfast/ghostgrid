@@ -1,4 +1,4 @@
-Here's a preliminary list of some AI vision services and their response formats:
+Here's a preliminary list of some AI vision services and their response formats, object detection example:
 
 1. Anthropic Claude 3 Vision:
 ```javascript
