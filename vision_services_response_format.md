@@ -1,4 +1,4 @@
-Here's a list of major AI vision services and their response formats:
+Here's a preliminary list of some AI vision services and their response formats:
 
 1. Anthropic Claude 3 Vision:
 ```javascript
@@ -162,25 +162,5 @@ Here's a list of major AI vision services and their response formats:
     "model_name": "facebook/detr-resnet-50"
 }
 ```
+8. Nvidia NIM?
 
-Key differences across platforms:
-1. **Coordinate Systems**:
-   - Anthropic: Absolute pixel coordinates
-   - Google: Normalized vertices (0-1)
-   - Azure: Absolute pixel coordinates
-   - Amazon: Normalized coordinates (0-1)
-   - Stability AI: Absolute pixel coordinates
-   - Hugging Face: Normalized coordinates (0-1)
-
-2. **Confidence Scores**:
-   - Anthropic: Not included
-   - Most others: Include confidence scores for detections
-
-3. **Metadata Inclusion**:
-   - Azure/Google: More extensive metadata
-   - Anthropic/OpenAI: Focus on token usage
-   - Stability AI: Includes processing time
-
-4. **Response Structure**:
-   - OpenAI/Anthropic: Chat-completion style
-   - Others: Direct object detection results
