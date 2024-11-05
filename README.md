@@ -5,10 +5,9 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
 
 ### Some benchmarks sites
-* https://mmmu-benchmark.github.io/
-* https://lmarena.ai/
-* https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard
-* https://huggingface.co/spaces/opencompass/openvlm_video_leaderboard
+* https://mmmu-benchmark.github.io
+* https://lmarena.ai
+* https://rank.opencompass.org.cn/home
 
 ### Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
