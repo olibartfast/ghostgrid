@@ -1,9 +1,5 @@
 Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
-### OpenAI API-compliant C++ multimodal inference client:
-* [C++ code](OpenAI-completion-client/cpp/Readme.md)
-* [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
-
 ### Some benchmarks sites
 * https://mmmu-benchmark.github.io
 * https://lmarena.ai
@@ -20,3 +16,13 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://azure.microsoft.com/en-us/products/ai-services/ai-vision
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
+
+## Inference
+  ### OpenAI API-compliant C++ multimodal inference client:
+  * [C++ code](OpenAI-completion-client/cpp/Readme.md)
+  * [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
+
+  ### TensorRT-LLM inference client python/c++
+  * TODO check documentation:
+     * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
+     * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
