@@ -7,3 +7,10 @@
 
 ## Gemini API
 * https://ai.google.dev/gemini-api/docs/downloads
+
+
+## Kaggle-Google Gen AI docs
+* https://www.kaggle.com/whitepaper-prompt-engineering
+* https://www.kaggle.com/whitepaper-embeddings-and-vector-stores
+* https://www.kaggle.com/whitepaper-agents
+
