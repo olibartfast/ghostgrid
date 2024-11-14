@@ -9,8 +9,8 @@
 * https://ai.google.dev/gemini-api/docs/downloads
 
 
-## Kaggle-Google Gen AI docs
+## Kaggle-Google 5-Day Gen AI Intensive docs 
 * https://www.kaggle.com/whitepaper-prompt-engineering
 * https://www.kaggle.com/whitepaper-embeddings-and-vector-stores
 * https://www.kaggle.com/whitepaper-agents
-
+* https://www.kaggle.com/whitepaper-solving-domains-specific-problems-using-llms
