@@ -14,3 +14,5 @@
 * https://www.kaggle.com/whitepaper-embeddings-and-vector-stores
 * https://www.kaggle.com/whitepaper-agents
 * https://www.kaggle.com/whitepaper-solving-domains-specific-problems-using-llms
+* https://www.kaggle.com/whitepaper-operationalizing-generative-ai-on-vertex-ai-using-mlops
+* https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/e2e-gen-ai-app-starter-pack
