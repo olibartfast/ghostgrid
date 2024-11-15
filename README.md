@@ -1,15 +1,15 @@
 Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
 
-### Some benchmarks sites
+## Some benchmarks sites
 * https://mmmu-benchmark.github.io
 * https://lmarena.ai
 * https://rank.opencompass.org.cn/home
 
-### Online courses
+## Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
 
 
-### Vision Multimodal API Services (tentative list)
+## Vision Multimodal API Services (tentative list)
 * https://docs.anthropic.com/en/docs/build-with-claude/vision
 * https://platform.openai.com/docs/guides/vision
 * https://cloud.google.com/vision?hl=en
@@ -17,13 +17,13 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
 
-### Finetuning
+## Finetuning
 * Microsoft Deepspeed: https://github.com/microsoft/DeepSpeed
 * Modelscop Swift: https://swift.readthedocs.io/en/latest/Multi-Modal/
 * Llama factory: https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
 * InternVL2 (for InternVL models): https://internvl.readthedocs.io/en/latest/internvl2.0/finetune.html
 
-### Inference
+## Inference
   ### OpenAI API-compliant C++ multimodal inference client:
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
   * [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
@@ -33,5 +33,5 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
 
-### Use/rent a gpu cluster in cloud
+## Use/rent a gpu cluster in cloud
 * https://www.brev.dev/
