@@ -23,7 +23,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * Llama factory: https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
 * InternVL2 (for InternVL models): https://internvl.readthedocs.io/en/latest/internvl2.0/finetune.html
 
-## Inference
+### Inference
   ### OpenAI API-compliant C++ multimodal inference client:
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
   * [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
@@ -33,5 +33,5 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
 
-## Use/rent a gpu cluster in cloud
+### Use/rent a gpu cluster in cloud
 * https://www.brev.dev/
