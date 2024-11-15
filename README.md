@@ -28,5 +28,5 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
 
 
-## Train/Deploy/Inference in Cloud using a gpu cluster
+## Train/Finetuning/Inference/Deploy in Cloud using/renting a gpu cluster
 * https://www.brev.dev/
