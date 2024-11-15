@@ -16,3 +16,6 @@
 * https://www.kaggle.com/whitepaper-solving-domains-specific-problems-using-llms
 * https://www.kaggle.com/whitepaper-operationalizing-generative-ai-on-vertex-ai-using-mlops
 * https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/sample-apps/e2e-gen-ai-app-starter-pack
+
+## deeplearning.ai
+* https://www.deeplearning.ai/short-courses/large-multimodal-model-prompting-with-gemini/
