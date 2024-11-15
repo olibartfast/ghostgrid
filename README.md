@@ -7,7 +7,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 
 ### Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
-* https://www.deeplearning.ai/short-courses/large-multimodal-model-prompting-with-gemini/
+
 
 ### Vision Multimodal API Services (tentative list)
 * https://docs.anthropic.com/en/docs/build-with-claude/vision
