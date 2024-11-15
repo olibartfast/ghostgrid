@@ -17,6 +17,12 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
 
+### Finetuning
+* Microsoft Deepspeed: https://github.com/microsoft/DeepSpeed
+* Modelscop Swift: https://swift.readthedocs.io/en/latest/Multi-Modal/
+* Llama factory: https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
+* InternVL2 (for InternVL models): https://internvl.readthedocs.io/en/latest/internvl2.0/finetune.html
+
 ## Inference
   ### OpenAI API-compliant C++ multimodal inference client:
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
@@ -27,6 +33,5 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
 
-
-## Train/Finetuning/Inference/Deploy in Cloud using/renting a gpu cluster
+## Use/rent a gpu cluster in cloud
 * https://www.brev.dev/
