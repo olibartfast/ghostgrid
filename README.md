@@ -3,7 +3,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 ## Some benchmarks sites
 * https://mmmu-benchmark.github.io
 * https://lmarena.ai
-* https://rank.opencompass.org.cn/home
+* https://rank.opencompass.org.cn/home (or https://huggingface.co/spaces/opencompass/open_vlm_leaderboard)
 
 ## Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
