@@ -22,6 +22,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * Modelscop Swift: https://swift.readthedocs.io/en/latest/Multi-Modal/
 * Llama factory: https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
 * InternVL2 (for InternVL models): https://internvl.readthedocs.io/en/latest/internvl2.0/finetune.html
+* https://huggingface.co/learn/cookbook/en/fine_tuning_vlm_trl
 
 ## Inference
   ### OpenAI API-compliant C++ multimodal inference client:
