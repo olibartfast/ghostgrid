@@ -30,6 +30,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * Huggingface:
   * https://huggingface.co/learn/cookbook/en/fine_tuning_vlm_trl
   * https://www.philschmid.de/fine-tune-multimodal-llms-with-trl
+  * https://huggingface.co/blog/smolvlm
 
 ## Inference
   ### OpenAI API-compliant C++ multimodal inference client:
