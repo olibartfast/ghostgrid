@@ -34,7 +34,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
  
 ## Multimodal RAG
 * Huggingface:
- * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms  
+  * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms  
 
 ## Inference
   ### OpenAI API-compliant C++ multimodal inference client:
