@@ -5,6 +5,7 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://lmarena.ai
 * https://huggingface.co/spaces/WildVision/vision-arena (paper: https://arxiv.org/pdf/2406.11069)
 * https://rank.opencompass.org.cn/home (or https://huggingface.co/spaces/opencompass/open_vlm_leaderboard)
+* https://mrsalehi.github.io/action-atlas/
 
 ## Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
