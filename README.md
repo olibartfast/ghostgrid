@@ -3,7 +3,6 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 ## Some benchmarks sites
 * https://mmmu-benchmark.github.io
 * https://lmarena.ai
-* https://huggingface.co/spaces/WildVision/vision-arena (paper: https://arxiv.org/pdf/2406.11069)
 * https://rank.opencompass.org.cn/home (or https://huggingface.co/spaces/opencompass/open_vlm_leaderboard)
 * https://mrsalehi.github.io/action-atlas/
 
