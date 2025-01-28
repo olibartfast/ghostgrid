@@ -22,8 +22,6 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 ## Finetuning
 * Microsoft Deepspeed:
   * https://github.com/microsoft/DeepSpeed
-* Modelscop Swift:
-  * https://swift.readthedocs.io/en/latest/Multi-Modal/
 * Llama factory:
   * https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
 * InternVL2 (for InternVL models):
