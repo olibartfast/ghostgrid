@@ -18,6 +18,9 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
 
+## Multimodal projects
+* https://github.com/facebookresearch/multimodal
+
 ## Finetuning
 * Microsoft Deepspeed:
   * https://github.com/microsoft/DeepSpeed
