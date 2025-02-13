@@ -1,4 +1,4 @@
-Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal Models) and VLM (Vision Language Model)
+Sandbox for experimenting with VLM (Vision Language Models)
 
 ## Some general benchmark sites
 * https://mmmu-benchmark.github.io
