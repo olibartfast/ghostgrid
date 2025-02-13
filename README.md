@@ -27,9 +27,9 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 
 ## Finetuning 
 * Roboflow Maestro:
- *  https://github.com/roboflow/maestro/tree/develop/cookbooks
-* Unsloath AI:
- * https://docs.unsloth.ai/basics/vision-fine-tuning   
+  * https://github.com/roboflow/maestro/tree/develop/cookbooks
+* Unsloth AI:
+  * https://docs.unsloth.ai/basics/vision-fine-tuning   
 * Microsoft Deepspeed:
   * https://github.com/microsoft/DeepSpeed
 * Llama factory:
