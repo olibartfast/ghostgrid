@@ -25,10 +25,11 @@ Sandbox for experimenting with LLM(Large Languange Models) LMM(Large Multimodal 
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
 
-## Multimodal projects
-* https://github.com/facebookresearch/multimodal
-
-## Finetuning
+## Finetuning 
+* Roboflow Maestro:
+ *  https://github.com/roboflow/maestro/tree/develop/cookbooks
+* Unsloath AI:
+ * https://docs.unsloth.ai/basics/vision-fine-tuning   
 * Microsoft Deepspeed:
   * https://github.com/microsoft/DeepSpeed
 * Llama factory:
