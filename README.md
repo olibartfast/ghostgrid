@@ -39,7 +39,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 * Huggingface:
   * https://huggingface.co/learn/cookbook/en/fine_tuning_vlm_trl
   * https://www.philschmid.de/fine-tune-multimodal-llms-with-trl
-  * https://huggingface.co/blog/smolvlm
+  * [https://huggingface.co/blog/smolvlm2](https://github.com/huggingface/smollm/blob/main/vision/finetuning/SmolVLM2_Video_FT.ipynb)
  
 ## Multimodal RAG
 * Huggingface:
