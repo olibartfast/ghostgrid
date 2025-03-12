@@ -46,6 +46,8 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms  
 
 ## Inference
+  ### gemma.cpp
+  * [gemma.cpp](https://github.com/google/gemma.cpp): C++ inference engine for the Gemma foundation models from Google 
   ### OpenAI API-compliant C++ multimodal inference client:
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
   * [Python code](OpenAI-completion-client/python/Readme.md) (TODO Image Resize in python code)
