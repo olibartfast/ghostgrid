@@ -4,7 +4,7 @@ A C++ command-line interface (CLI) tool for sending multimodal prompts (text and
 
 ## Key Features
 
-- **Multiple API Provider Support**: Compatible with various providers including:
+- **Multiple API Provider Support**:  Compatible with various providers (generally should work with any provider compatible with the OpenAI Chat API) including:
   - OpenAI
   - Together
   - vLLM
