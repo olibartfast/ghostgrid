@@ -48,7 +48,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 ## Inference
   ### gemma.cpp
   * [gemma.cpp](https://github.com/google/gemma.cpp): C++ inference engine for the Gemma foundation models from Google 
-  ### OpenAI API-compliant C++ multimodal inference client:
+  ### OpenAI API-compliant multimodal inference client
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
   * [Python code](OpenAI-completion-client/python/Readme.md)
 
