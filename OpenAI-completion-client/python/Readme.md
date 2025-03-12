@@ -37,7 +37,9 @@ cd vision-language-models-playground/OpenAI-client/python
 You can run the script using the following command:
 
 ```bash
-python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model openai_model_name --tokens max_token_output
+python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model <your_service_model_name> --tokens <max_token_output> --resize --size
+
+ <your_desired_W> <your_desired_H>
 ```
 
 **Arguments:**
@@ -48,13 +50,15 @@ python main.py --prompt "your prompt" --images image1.jpg ... imageN.jp  --model
 - `--url` (optional): API endpoint URL (default: `https://api.openai.com/v1/chat/completions`).
 - `--detail` (optional): Detail level for image analysis (default: `low`).
 - `--tokens` (optional): Maximum number of tokens in the response (default: `300`).
+- `--resize` (optional): Resize images with padding.
+- `--size` (optional): Target size for resized images (width height), default: `512`.
 
 ### Example Usage
 
 Analyze an image using the script:
 
 ```bash
-python main.py -p "Describe this image" -i image.jpg -m gpt-4o-mini -t 300
+python main.py -p "Describe this image" -i image.jpg -m gpt-4o-mini -t 300 --resize --size 800 600
 ```
 
 ### Environment Variables
