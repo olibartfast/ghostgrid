@@ -1,7 +1,7 @@
 Sandbox for experimenting with VLM (Vision Language Models)
 
 * Currently developing:
-### OpenAI API-compliant multimodal inference client
+#### OpenAI API-compliant multimodal inference client
   * [C++ code](OpenAI-completion-client/cpp/Readme.md)
   * [Python code](OpenAI-completion-client/python/Readme.md)
 
