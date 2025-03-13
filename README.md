@@ -1,5 +1,12 @@
 Sandbox for experimenting with VLM (Vision Language Models)
 
+* Currently developing:
+### OpenAI API-compliant multimodal inference client
+  * [C++ code](OpenAI-completion-client/cpp/Readme.md)
+  * [Python code](OpenAI-completion-client/python/Readme.md)
+
+
+# References and other docs
 ## Some general benchmark sites
 * https://mmmu-benchmark.github.io
 * https://lmarena.ai
@@ -48,10 +55,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 
 ## Inference
   ### gemma.cpp
-  * [gemma.cpp](https://github.com/google/gemma.cpp): C++ inference engine for the Gemma foundation models from Google 
-  ### OpenAI API-compliant multimodal inference client
-  * [C++ code](OpenAI-completion-client/cpp/Readme.md)
-  * [Python code](OpenAI-completion-client/python/Readme.md)
+  * [gemma.cpp](https://github.com/google/gemma.cpp): C++ inference engine for the Gemma foundation models from Google
 
   ### TensorRT-LLM inference client python/c++
   * TODO check documentation:
