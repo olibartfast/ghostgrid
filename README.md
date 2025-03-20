@@ -61,6 +61,8 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * TODO check documentation:
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
+  ### Openvino
+  * [Visual-language assistant using DeepSeek-VL2 and OpenVINO](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/deepseek-vl2/deepseek-vl2.ipynb)
 
 ## Use/rent a gpu cluster in cloud
 * https://www.brev.dev/
