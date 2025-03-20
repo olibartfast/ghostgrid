@@ -62,9 +62,9 @@ Sandbox for experimenting with VLM (Vision Language Models)
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/cpp/executor/README.md
   ### Openvino
-  * Visual language assustant using: 
+  * Visual language assistant using: 
      * [DeepSeek-VL2](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/deepseek-vl2/deepseek-vl2.ipynb)
-     * [Gemma3](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/gemma3)
+     * [Gemma3](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/gemma3/gemma3.ipynb)
      * [Qwen2.5-VL](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qwen2.5-vl/qwen2.5-vl.ipynb)
 
 ## Use/rent a gpu cluster in cloud
