@@ -65,7 +65,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * Visual language assustant using: 
      * [DeepSeek-VL2](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/deepseek-vl2/deepseek-vl2.ipynb)
      * [Gemma3](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/gemma3)
-     * [Qwen2.5-VL](https://github.com/openvinotoolkit/openvino_notebooks/tree/latest/notebooks/qwen2.5-vl)
+     * [Qwen2.5-VL](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qwen2.5-vl/qwen2.5-vl.ipynb)
 
 ## Use/rent a gpu cluster in cloud
 * https://www.brev.dev/
