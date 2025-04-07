@@ -31,6 +31,8 @@ Sandbox for experimenting with VLM (Vision Language Models)
 * https://azure.microsoft.com/en-us/products/ai-services/ai-vision
 * https://aws.amazon.com/rekognition/
 * https://platform.stability.ai/docs/api-reference
+* https://api.together.ai
+* https://cloud.cerebras.ai
 
 ## Finetuning 
 * Roboflow Maestro:
