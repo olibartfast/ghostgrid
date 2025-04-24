@@ -70,4 +70,4 @@ Sandbox for experimenting with VLM (Vision Language Models)
      * [Qwen2.5-VL](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qwen2.5-vl/qwen2.5-vl.ipynb)
 
 ## Use/rent a gpu cluster in cloud
-* https://www.brev.dev/
+* https://www.brev.dev/ (docs https://docs.nvidia.com/brev/latest/index.html)
