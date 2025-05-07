@@ -38,9 +38,8 @@ Sandbox for experimenting with VLM (Vision Language Models)
 * Roboflow Maestro:
   * https://github.com/roboflow/maestro/tree/develop/cookbooks
 * Unsloth AI:
-  * https://docs.unsloth.ai/basics/vision-fine-tuning   
-* Microsoft Deepspeed:
-  * https://github.com/microsoft/DeepSpeed
+  * https://docs.unsloth.ai/basics/vision-fine-tuning
+  * https://learnopencv.com/unsloth-guide-efficient-llm-fine-tuning/
 * Llama factory:
   * https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
 * InternVL2 (for InternVL models):
@@ -70,4 +69,4 @@ Sandbox for experimenting with VLM (Vision Language Models)
      * [Qwen2.5-VL](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/qwen2.5-vl/qwen2.5-vl.ipynb)
 
 ## Use/rent a gpu cluster in cloud
-* https://www.brev.dev/ (docs https://docs.nvidia.com/brev/latest/index.html)
+* https://www.brev.nvidia.com/ (docs https://docs.nvidia.com/brev/latest/index.html)
