@@ -19,6 +19,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 * [TVBench](https://github.com/daniel-cores/tvbench)
 * [Action-Atlas](https://mrsalehi.github.io/action-atlas/)
 * [sharegpt4video](https://sharegpt4video.github.io/)
+* [VideoEval-Pro](https://github.com/TIGER-AI-Lab/VideoEval-Pro)
 
 
 ## Online courses
