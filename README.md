@@ -44,8 +44,6 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * https://learnopencv.com/unsloth-guide-efficient-llm-fine-tuning/
 * Llama factory:
   * https://github.com/hiyouga/LLaMA-Factory/blob/main/examples/README.md
-* InternVL2 (for InternVL models):
-  * https://internvl.readthedocs.io/en/latest/internvl2.0/finetune.html
 * Huggingface:
   * https://huggingface.co/learn/cookbook/en/fine_tuning_vlm_trl
   * https://www.philschmid.de/fine-tune-multimodal-llms-with-trl
@@ -57,9 +55,6 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms  
 
 ## Inference
-  ### gemma.cpp
-  * [gemma.cpp](https://github.com/google/gemma.cpp): C++ inference engine for the Gemma foundation models from Google
-
   ### TensorRT-LLM inference client python/c++
   * TODO check documentation:
      * https://github.com/NVIDIA/TensorRT-LLM/blob/main/examples/multimodal/README.md
