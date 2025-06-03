@@ -29,6 +29,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 ## Vision Multimodal API Services (tentative list)
 * https://docs.anthropic.com/en/docs/build-with-claude/vision
 * https://platform.openai.com/docs/guides/vision
+* https://cookbook.openai.com/topic/multimodal
 * https://cloud.google.com/vision?hl=en
 * https://azure.microsoft.com/en-us/products/ai-services/ai-vision
 * https://aws.amazon.com/rekognition/
