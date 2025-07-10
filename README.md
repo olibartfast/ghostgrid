@@ -24,6 +24,7 @@ Sandbox for experimenting with VLM (Vision Language Models)
 
 ## Online courses
 * https://www.deeplearning.ai/short-courses/prompt-engineering-for-vision-models/
+* https://opencv.org/university/vision-language-model-bootcamp
 
 
 ## Vision Multimodal API Services (tentative list)
