@@ -53,8 +53,8 @@ Sandbox for experimenting with VLM (Vision Language Models)
   * [https://huggingface.co/blog/smolvlm2](https://github.com/huggingface/smollm/blob/main/vision/finetuning/SmolVLM2_Video_FT.ipynb)
  
 ## Multimodal RAG
-* Huggingface:
-  * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms  
+  * https://huggingface.co/learn/cookbook/multimodal_rag_using_document_retrieval_and_vlms
+  * https://www.deeplearning.ai/courses/retrieval-augmented-generation-rag/ 
 
 ## Inference
   ### TensorRT-LLM inference client python/c++
