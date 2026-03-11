@@ -1,6 +1,6 @@
 # VLM Agent Gateway
 
-Multi-provider Vision Language Model inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring.
+Multi-provider Vision–Language Model (VLM) inference gateway supporting agent orchestration patterns such as sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring pipelines.
 
 ## Installation
 
