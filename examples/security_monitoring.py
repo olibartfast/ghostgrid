@@ -2,7 +2,7 @@
 """
 Security Monitoring Example
 
-Demonstrates using the VLM Agent Gateway for security camera monitoring.
+Demonstrates using the Multimodal Agent Gateway for security camera monitoring.
 Monitors for intrusion, unauthorized access, or suspicious activity.
 
 Usage:
@@ -20,8 +20,8 @@ Usage:
 import argparse
 import sys
 
-from vlm_agent_gateway import run_monitoring
-from vlm_agent_gateway.config import get_api_key, get_default_endpoint
+from multimodal_agent_gateway import run_monitoring
+from multimodal_agent_gateway.config import get_api_key, get_default_endpoint
 
 
 def main():

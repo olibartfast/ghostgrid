@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from vlm_agent_gateway.config import (
+from multimodal_agent_gateway.config import (
     DEFAULT_ENDPOINT,
     PROVIDER_ENV_MAP,
     WORKFLOW_CHOICES,

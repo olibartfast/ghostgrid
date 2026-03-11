@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "vlm-agent-gateway"
+name = "multimodal-agent-gateway"
 dynamic = ["version"]
-description = "Multi-provider VLM inference with sequential, parallel, conditional, iterative, MoA, and ReAct workflows"
+description = "Multi-provider LLM and VLM inference with sequential, parallel, conditional, iterative, MoA, and ReAct workflows"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
-keywords = ["vlm", "vision", "multimodal", "agent", "workflow", "openai", "anthropic"]
+keywords = ["llm", "vlm", "vision", "multimodal", "agent", "workflow", "openai", "anthropic"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -40,14 +40,14 @@ dev = [
     "mypy>=1.0.0",
 ]
 all = [
-    "vlm-agent-gateway[video,dev]",
+    "multimodal-agent-gateway[video,dev]",
 ]
 
 [project.scripts]
-vlm-agent-gateway = "vlm_agent_gateway.cli:main"
+agent-gateway = "multimodal_agent_gateway.cli:main"
 
 [project.urls]
-Repository = "https://github.com/francescoXeo/vlm-agent-gateway"
+Repository = "https://github.com/francescoXeo/multimodal-agent-gateway"
 
 [tool.hatch.version]
 path = "VERSION"
@@ -66,7 +66,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/vlm_agent_gateway"]
+packages = ["src/multimodal_agent_gateway"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -86,5 +86,5 @@ ignore = ["E501"]
 python_version = "3.10"
 warn_return_any = true
 warn_unused_ignores = true
-packages = ["vlm_agent_gateway"]
+packages = ["multimodal_agent_gateway"]
 mypy_path = "src"

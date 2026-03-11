@@ -13,8 +13,8 @@ import argparse
 import json
 import sys
 
-from vlm_agent_gateway import run_moa
-from vlm_agent_gateway.cli import make_agent
+from multimodal_agent_gateway import run_moa
+from multimodal_agent_gateway.cli import make_agent
 
 
 def main():

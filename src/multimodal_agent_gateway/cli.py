@@ -1,6 +1,4 @@
-"""
-Command-line interface for VLM Agent Gateway.
-"""
+"""Command-line interface for Multimodal Agent Gateway."""
 
 import argparse
 import json
@@ -9,14 +7,14 @@ import os
 import sys
 import uuid
 
-from vlm_agent_gateway.config import (
+from multimodal_agent_gateway.config import (
     DEFAULT_ENDPOINT,
     PROVIDER_ENV_MAP,
     resolve_endpoint,
 )
-from vlm_agent_gateway.models import Agent
-from vlm_agent_gateway.tools import BUILTIN_TOOLS
-from vlm_agent_gateway.workflows import (
+from multimodal_agent_gateway.models import Agent
+from multimodal_agent_gateway.tools import BUILTIN_TOOLS
+from multimodal_agent_gateway.workflows import (
     WORKFLOW_REGISTRY,
     run_conditional,
     run_iterative,
@@ -72,7 +70,7 @@ def cmd_run(args) -> None:
 
         common = {
             "prompt": args.prompt,
-            "image_paths": args.images,
+            "image_paths": args.images or [],
             "detail": args.detail,
             "max_tokens": args.tokens,
             "resize": args.resize,
@@ -178,9 +176,9 @@ def cmd_monitor(args) -> None:
 def main() -> None:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        prog="vlm-agent-gateway",
+        prog="agent-gateway",
         description=(
-            "VLM Agent Gateway — multi-provider vision inference with "
+            "Multimodal Agent Gateway — multi-provider LLM and VLM inference with "
             "sequential, parallel, conditional, iterative, MoA, ReAct, and monitoring workflows"
         ),
     )
@@ -190,11 +188,11 @@ def main() -> None:
     # ========================================================================
     # Subcommand: run (default workflow execution)
     # ========================================================================
-    run_parser = subparsers.add_parser("run", help="Run a VLM workflow")
+    run_parser = subparsers.add_parser("run", help="Run an LLM or VLM workflow")
 
     # Image / prompt
-    run_parser.add_argument("--prompt", "-p", type=str, default="What's in this image?")
-    run_parser.add_argument("--images", "-i", type=str, nargs="+", required=True, help="Image paths or URLs")
+    run_parser.add_argument("--prompt", "-p", type=str, default="What's in this input?")
+    run_parser.add_argument("--images", "-i", type=str, nargs="+", default=None, help="Optional image paths or URLs")
     run_parser.add_argument("--detail", "-d", type=str, default="low", choices=["auto", "low", "high"])
     run_parser.add_argument("--tokens", "-t", type=int, default=300, help="Max tokens per response")
     run_parser.add_argument("--resize", "-r", action="store_true", help="Resize images with padding")
@@ -255,7 +253,7 @@ def main() -> None:
     # ========================================================================
     # Subcommand: monitor (video monitoring)
     # ========================================================================
-    monitor_parser = subparsers.add_parser("monitor", help="Video monitoring with VLM")
+    monitor_parser = subparsers.add_parser("monitor", help="Video monitoring with a VLM")
 
     monitor_parser.add_argument(
         "--video", "-v", required=True, help="Video file path, RTSP URL, or device index (0 for webcam)"

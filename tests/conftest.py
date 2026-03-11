@@ -1,10 +1,10 @@
 """
-Shared test fixtures for VLM Agent Gateway tests.
+Shared test fixtures for Multimodal Agent Gateway tests.
 """
 
 import pytest
 
-from vlm_agent_gateway.models import Agent, AgentResult
+from multimodal_agent_gateway.models import Agent, AgentResult
 
 
 @pytest.fixture

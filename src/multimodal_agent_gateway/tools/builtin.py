@@ -2,8 +2,8 @@
 Built-in ReAct tools for vision analysis.
 """
 
-from vlm_agent_gateway.models import Agent, Tool
-from vlm_agent_gateway.providers import run_agent
+from multimodal_agent_gateway.models import Agent, Tool
+from multimodal_agent_gateway.providers import run_agent
 
 
 def _tool_describe(
