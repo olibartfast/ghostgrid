@@ -1,8 +1,12 @@
 """Tests for CLI helpers."""
 
+import json
+import sys
+
 import pytest
 
-from vlm_agent_gateway.cli import build_agents
+from multimodal_agent_gateway import cli
+from multimodal_agent_gateway.cli import build_agents
 
 
 def test_build_agents_uses_provider_specific_default_endpoints(monkeypatch):
@@ -26,3 +30,30 @@ def test_build_agents_rejects_azure_without_endpoint(monkeypatch):
 
     with pytest.raises(RuntimeError, match="requires an explicit --endpoint"):
         build_agents(models=["gpt-5.2"], providers=["azure"], endpoints=[])
+
+
+def test_main_allows_text_only_run(monkeypatch, capsys):
+    """The run command should work without --images for text-only LLM calls."""
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-test")
+    monkeypatch.setattr(
+        cli,
+        "WORKFLOW_REGISTRY",
+        {
+            "sequential": lambda agents, **kwargs: {
+                "workflow": "sequential",
+                "content": "ok",
+                "image_paths": kwargs["image_paths"],
+            }
+        },
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["agent-gateway", "run", "--prompt", "Hello", "--model", "gpt-5.2", "--workflow", "sequential"],
+    )
+
+    cli.main()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["content"] == "ok"
+    assert output["image_paths"] == []

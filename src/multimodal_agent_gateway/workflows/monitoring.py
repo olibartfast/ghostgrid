@@ -10,13 +10,13 @@ import logging
 import time
 from datetime import datetime, timezone
 
-from vlm_agent_gateway.config import MONITOR_SYSTEM_PROMPT
-from vlm_agent_gateway.models import AlertEvent
-from vlm_agent_gateway.providers import build_video_payload, normalize_response, send_request
-from vlm_agent_gateway.tools.parsing import parse_monitor_output
-from vlm_agent_gateway.video import extract_frames_cv2, frames_to_base64
+from multimodal_agent_gateway.config import MONITOR_SYSTEM_PROMPT
+from multimodal_agent_gateway.models import AlertEvent
+from multimodal_agent_gateway.providers import build_video_payload, normalize_response, send_request
+from multimodal_agent_gateway.tools.parsing import parse_monitor_output
+from multimodal_agent_gateway.video import extract_frames_cv2, frames_to_base64
 
-log = logging.getLogger("vlm-agent-gateway.monitoring")
+log = logging.getLogger("multimodal-agent-gateway.monitoring")
 
 
 def run_monitoring_cycle(

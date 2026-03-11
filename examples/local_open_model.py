@@ -16,8 +16,8 @@ Usage:
 import argparse
 import json
 
-from vlm_agent_gateway import run_sequential
-from vlm_agent_gateway.models import Agent
+from multimodal_agent_gateway import run_sequential
+from multimodal_agent_gateway.models import Agent
 
 
 def main() -> None:

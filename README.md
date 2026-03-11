@@ -1,6 +1,6 @@
-# VLM Agent Gateway
+# Multimodal Agent Gateway
 
-Multi-provider Vision Language Model inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring.
+Multi-provider LLM and VLM inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring.
 
 ## Installation
 
@@ -19,35 +19,39 @@ pip install -e ".[dev,video]"
 
 ```bash
 # Sequential workflow (default) - each stage builds on previous
-vlm-agent-gateway run --workflow sequential \
+agent-gateway run --workflow sequential \
+    --prompt "Summarize the tradeoffs of MoE vs dense models"
+
+# Sequential multimodal workflow
+agent-gateway run --workflow sequential \
     --prompt "Describe this image" \
     --images image.jpg \
     --models gpt-5.2 gpt-5.2 \
     --providers openai openai
 
 # Parallel workflow - same input to multiple agents
-vlm-agent-gateway run --workflow parallel \
+agent-gateway run --workflow parallel \
     --prompt "What objects are in this image?" \
     --images image.jpg \
     --models gpt-5.2 meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8 \
     --providers openai together
 
 # ReAct workflow - agent reasons and uses tools
-vlm-agent-gateway run --workflow react \
+agent-gateway run --workflow react \
     --prompt "Count the people and describe what they're doing" \
     --images image.jpg \
     --model gpt-5.2 \
     --tools describe detect_objects count_objects
 
 # Video monitoring - continuous or single-shot
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video ./sample.mp4 \
     --alert-prompt "Is anyone falling or in distress?" \
     --provider google \
     --model gemini-2.5-flash
 
 # Continuous webcam monitoring
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video 0 \
     --alert-prompt "Has anyone entered the restricted area?" \
     --continuous --interval 10
@@ -57,6 +61,7 @@ vlm-agent-gateway monitor \
 
 - **7 workflow patterns** — `sequential`, `parallel`, `conditional`, `iterative`, `moa`, `react`, `monitor`
 - **Multi-provider support** — OpenAI, Anthropic, Google, Together, Azure, Groq, Mistral
+- **Text-only or multimodal runs** — use `run` with just `--prompt`, or add `--images`
 - **Video monitoring** — Fall detection, security monitoring, safety compliance
 - **ReAct tools** — describe, detect_objects, read_text, analyze_region, count_objects
 - **Observability** — per-agent latency, correlation IDs, structured JSON output
@@ -75,23 +80,23 @@ vlm-agent-gateway monitor \
 
 ## Video Monitoring
 
-The `monitor` command supports video-capable VLMs for real-time monitoring:
+The `monitor` command remains vision-specific and supports video-capable VLMs for real-time monitoring:
 
 ```bash
 # Fall detection
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video ./elderly_room.mp4 \
     --alert-prompt "Is anyone falling, lying on the floor, or in distress?" \
     --fps 1 --max-frames 30
 
 # Continuous security monitoring
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video rtsp://camera.local:554/stream \
     --alert-prompt "Has anyone entered the restricted zone?" \
     --continuous --interval 10 --window-frames 8
 
 # Self-hosted with vLLM
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video 0 \
     --endpoint http://localhost:8000/v1/chat/completions \
     --model Qwen/Qwen3-VL-8B-Instruct \
@@ -117,8 +122,8 @@ See [docs/video-vlm-agents.md](docs/video-vlm-agents.md) for model recommendatio
 ## Python API
 
 ```python
-from vlm_agent_gateway import run_sequential, run_react, run_monitoring
-from vlm_agent_gateway.cli import make_agent
+from multimodal_agent_gateway import run_sequential, run_react, run_monitoring
+from multimodal_agent_gateway.cli import make_agent
 
 # Create agents
 agent = make_agent("gpt-5.2", "openai", "https://api.openai.com/v1/chat/completions")
@@ -142,7 +147,7 @@ print(result["content"])
 
 - `examples/react_image_analysis.py` shows a tool-using ReAct loop for OCR, counting, and scene analysis.
 - `examples/conditional_routing.py` routes an image task between OCR, scene, and safety specialists.
-- `examples/local_open_model.py` runs a self-hosted open VLM through a local OpenAI-compatible endpoint.
+- `examples/local_open_model.py` runs a self-hosted open model through a local OpenAI-compatible endpoint.
 - `examples/multi_model_analysis.py`, `examples/fall_detection.py`, and `examples/security_monitoring.py` cover MoA and monitoring flows.
 
 ## C++ Client
