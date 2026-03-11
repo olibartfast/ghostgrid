@@ -138,6 +138,13 @@ result = run_react(
 print(result["content"])
 ```
 
+## Additional Examples
+
+- `examples/react_image_analysis.py` shows a tool-using ReAct loop for OCR, counting, and scene analysis.
+- `examples/conditional_routing.py` routes an image task between OCR, scene, and safety specialists.
+- `examples/local_open_model.py` runs a self-hosted open VLM through a local OpenAI-compatible endpoint.
+- `examples/multi_model_analysis.py`, `examples/fall_detection.py`, and `examples/security_monitoring.py` cover MoA and monitoring flows.
+
 ## C++ Client
 
 A lightweight C++ client for single-shot OpenAI-compatible inference.
