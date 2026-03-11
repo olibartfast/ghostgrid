@@ -136,14 +136,16 @@ def build_anthropic_video_payload(
     """
     content: list[dict] = [{"type": "text", "text": user_prompt}]
     for b64 in frame_b64_list:
-        content.append({
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": "image/jpeg",
-                "data": b64,
-            },
-        })
+        content.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": "image/jpeg",
+                    "data": b64,
+                },
+            }
+        )
     return {
         "model": model,
         "system": system_prompt,
