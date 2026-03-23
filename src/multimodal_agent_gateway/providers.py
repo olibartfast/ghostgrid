@@ -1,19 +1,17 @@
-"""
-API request/response handling for VLM providers.
-"""
+"""API request/response handling for LLM and VLM providers."""
 
 import json
 import time
 
 import requests
 
-from vlm_agent_gateway.image import encode_image, is_url
-from vlm_agent_gateway.models import Agent, AgentResult
+from multimodal_agent_gateway.image import encode_image, is_url
+from multimodal_agent_gateway.models import Agent, AgentResult
 
 
 def create_payload(
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     model: str,
     detail: str,
     max_tokens: int,
@@ -21,14 +19,14 @@ def create_payload(
     target_size: tuple[int, int] = (512, 512),
 ) -> dict:
     """
-    Build an OpenAI-compatible chat-completions payload with images.
+    Build an OpenAI-compatible chat-completions payload.
     """
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
         "max_tokens": max_tokens,
     }
-    for image_path in image_paths:
+    for image_path in image_paths or []:
         if is_url(image_path) and not resize:
             img_block = {
                 "type": "image_url",
@@ -84,7 +82,7 @@ def build_video_payload(
 
 def create_anthropic_payload(
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     model: str,
     max_tokens: int,
     resize: bool = False,
@@ -97,7 +95,7 @@ def create_anthropic_payload(
     instead of OpenAI's image_url wrapper.
     """
     content: list[dict] = [{"type": "text", "text": prompt}]
-    for image_path in image_paths:
+    for image_path in image_paths or []:
         if is_url(image_path) and not resize:
             img_block = {
                 "type": "image",
@@ -216,7 +214,7 @@ def normalize_response(response: dict, provider: str = "openai") -> str:
 def run_agent(
     agent: Agent,
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     detail: str,
     max_tokens: int,
     resize: bool,

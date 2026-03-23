@@ -1,8 +1,8 @@
 """
-VLM Agent Gateway - Multi-provider vision inference with workflow support.
+Multimodal Agent Gateway - Multi-provider LLM and VLM inference with workflow support.
 
-A framework for building agentic applications with Vision Language Models.
-Supports 7 VLM providers (OpenAI, Anthropic, Google, Together, Azure, Groq, Mistral)
+A framework for building agentic applications with text, vision, and multimodal models.
+Supports 7 providers (OpenAI, Anthropic, Google, Together, Azure, Groq, Mistral)
 and 7 workflow patterns (sequential, parallel, conditional, iterative, MoA, ReAct, monitoring).
 """
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 # Core models
 # Configuration
-from vlm_agent_gateway.config import (
+from multimodal_agent_gateway.config import (
     DEFAULT_ENDPOINT,
     PROVIDER_ENV_MAP,
     WORKFLOW_CHOICES,
@@ -20,11 +20,11 @@ from vlm_agent_gateway.config import (
 )
 
 # Image utilities
-from vlm_agent_gateway.image import encode_image, is_url, resize_with_padding
-from vlm_agent_gateway.models import Agent, AgentResult, AlertEvent, Tool
+from multimodal_agent_gateway.image import encode_image, is_url, resize_with_padding
+from multimodal_agent_gateway.models import Agent, AgentResult, AlertEvent, Tool
 
 # Provider functions
-from vlm_agent_gateway.providers import (
+from multimodal_agent_gateway.providers import (
     build_video_payload,
     create_payload,
     normalize_response,
@@ -33,13 +33,13 @@ from vlm_agent_gateway.providers import (
 )
 
 # Tools
-from vlm_agent_gateway.tools import BUILTIN_TOOLS
+from multimodal_agent_gateway.tools import BUILTIN_TOOLS
 
 # Video utilities
-from vlm_agent_gateway.video import extract_frames_cv2, frames_to_base64
+from multimodal_agent_gateway.video import extract_frames_cv2, frames_to_base64
 
 # Workflows
-from vlm_agent_gateway.workflows import (
+from multimodal_agent_gateway.workflows import (
     WORKFLOW_REGISTRY,
     run_conditional,
     run_continuous_monitoring,

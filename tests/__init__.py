@@ -1,1 +1,1 @@
-"""VLM Agent Gateway test suite."""
+"""Multimodal Agent Gateway test suite."""

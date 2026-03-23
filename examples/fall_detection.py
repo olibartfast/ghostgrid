@@ -2,7 +2,7 @@
 """
 Fall Detection Example
 
-Demonstrates using the VLM Agent Gateway for fall detection monitoring.
+Demonstrates using the Multimodal Agent Gateway for fall detection monitoring.
 Works with local vLLM, Together AI, or OpenAI.
 
 Usage:
@@ -26,12 +26,12 @@ Usage:
 import argparse
 import sys
 
-from vlm_agent_gateway import run_monitoring
-from vlm_agent_gateway.config import get_api_key, get_default_endpoint
+from multimodal_agent_gateway import run_monitoring
+from multimodal_agent_gateway.config import get_api_key, get_default_endpoint
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Fall detection with VLM monitoring")
+    parser = argparse.ArgumentParser(description="Fall detection with multimodal video monitoring")
     parser.add_argument("video", help="Video file, RTSP URL, or device index (0 for webcam)")
     parser.add_argument("--model", default="gemini-2.5-flash")
     parser.add_argument("--provider", default="google")

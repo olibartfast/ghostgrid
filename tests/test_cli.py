@@ -1,8 +1,12 @@
 """Tests for CLI helpers."""
 
+import json
+import sys
+
 import pytest
 
-from vlm_agent_gateway.cli import build_agents, main
+from multimodal_agent_gateway import cli
+from multimodal_agent_gateway.cli import build_agents, main
 
 
 def test_build_agents_uses_provider_specific_default_endpoints(monkeypatch):
@@ -40,12 +44,11 @@ def test_cli_images_optional_for_react(monkeypatch, capsys):
         return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
                 "stop_reason": "final_answer", "model": "m", "provider": "openai"}
 
-    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+    monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
-    import sys
     monkeypatch.setattr(
         sys, "argv",
-        ["vlm-agent-gateway", "run", "--workflow", "react",
+        ["agent-gateway", "run", "--workflow", "react",
          "--model", "gpt-4o", "--prompt", "list files",
          "--tools", "list_directory"],
     )
@@ -66,13 +69,12 @@ def test_cli_code_agent_flag_selects_code_tools(monkeypatch, capsys):
         return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
                 "stop_reason": "final_answer", "model": "m", "provider": "openai"}
 
-    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+    monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
-    import sys
-    from vlm_agent_gateway.config import CODE_AGENT_TOOLS, CODE_AGENT_SYSTEM_PROMPT
+    from multimodal_agent_gateway.config import CODE_AGENT_TOOLS, CODE_AGENT_SYSTEM_PROMPT
     monkeypatch.setattr(
         sys, "argv",
-        ["vlm-agent-gateway", "run", "--workflow", "react",
+        ["agent-gateway", "run", "--workflow", "react",
          "--model", "gpt-4o", "--prompt", "fix bug", "--code-agent"],
     )
     main()
@@ -92,12 +94,11 @@ def test_cli_allow_shell_flag(monkeypatch, capsys):
         return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
                 "stop_reason": "final_answer", "model": "m", "provider": "openai"}
 
-    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+    monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
-    import sys
     monkeypatch.setattr(
         sys, "argv",
-        ["vlm-agent-gateway", "run", "--workflow", "react",
+        ["agent-gateway", "run", "--workflow", "react",
          "--model", "gpt-4o", "--prompt", "run build",
          "--code-agent", "--allow-shell"],
     )
@@ -116,15 +117,41 @@ def test_cli_explicit_tools_override_code_agent_defaults(monkeypatch, capsys):
         return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
                 "stop_reason": "final_answer", "model": "m", "provider": "openai"}
 
-    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+    monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
-    import sys
     monkeypatch.setattr(
         sys, "argv",
-        ["vlm-agent-gateway", "run", "--workflow", "react",
+        ["agent-gateway", "run", "--workflow", "react",
          "--model", "gpt-4o", "--prompt", "read only",
          "--code-agent", "--tools", "read_file"],
     )
     main()
 
     assert captured["enabled_tools"] == ["read_file"]
+
+
+def test_main_allows_text_only_run(monkeypatch, capsys):
+    """The run command should work without --images for text-only LLM calls."""
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-test")
+    monkeypatch.setattr(
+        cli,
+        "WORKFLOW_REGISTRY",
+        {
+            "sequential": lambda agents, **kwargs: {
+                "workflow": "sequential",
+                "content": "ok",
+                "image_paths": kwargs["image_paths"],
+            }
+        },
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["agent-gateway", "run", "--prompt", "Hello", "--model", "gpt-5.2", "--workflow", "sequential"],
+    )
+
+    cli.main()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["content"] == "ok"
+    assert output["image_paths"] == []

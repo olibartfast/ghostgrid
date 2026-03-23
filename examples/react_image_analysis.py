@@ -18,9 +18,9 @@ import argparse
 import json
 import sys
 
-from vlm_agent_gateway import run_react
-from vlm_agent_gateway.cli import make_agent
-from vlm_agent_gateway.config import resolve_endpoint
+from multimodal_agent_gateway import run_react
+from multimodal_agent_gateway.cli import make_agent
+from multimodal_agent_gateway.config import resolve_endpoint
 
 
 def main() -> None:
