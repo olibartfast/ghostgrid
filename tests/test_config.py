@@ -5,6 +5,8 @@ import os
 import pytest
 
 from vlm_agent_gateway.config import (
+    CODE_AGENT_SYSTEM_PROMPT,
+    CODE_AGENT_TOOLS,
     DEFAULT_ENDPOINT,
     PROVIDER_ENV_MAP,
     WORKFLOW_CHOICES,
@@ -68,3 +70,29 @@ def test_get_api_key_missing():
     finally:
         if original:
             os.environ["TEST_MISSING_API_KEY"] = original
+
+
+# ---------------------------------------------------------------------------
+# Code-agent config additions
+# ---------------------------------------------------------------------------
+
+def test_code_agent_tools_contains_expected_tools():
+    """CODE_AGENT_TOOLS must include all filesystem/shell tools."""
+    expected = {"read_file", "write_file", "list_directory", "run_bash", "search_files"}
+    assert expected.issubset(set(CODE_AGENT_TOOLS))
+
+
+def test_code_agent_system_prompt_has_placeholder():
+    """CODE_AGENT_SYSTEM_PROMPT must contain {tool_descriptions} for formatting."""
+    assert "{tool_descriptions}" in CODE_AGENT_SYSTEM_PROMPT
+
+
+def test_code_agent_system_prompt_is_distinct_from_react_prompt():
+    """The code-agent prompt should be different from the vision ReAct prompt."""
+    from vlm_agent_gateway.config import REACT_SYSTEM_PROMPT
+    assert CODE_AGENT_SYSTEM_PROMPT != REACT_SYSTEM_PROMPT
+
+
+def test_code_agent_system_prompt_mentions_coding():
+    """The code-agent prompt should communicate its coding purpose."""
+    assert "coding" in CODE_AGENT_SYSTEM_PROMPT.lower() or "code" in CODE_AGENT_SYSTEM_PROMPT.lower()

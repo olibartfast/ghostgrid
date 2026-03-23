@@ -10,6 +10,8 @@ import sys
 import uuid
 
 from vlm_agent_gateway.config import (
+    CODE_AGENT_SYSTEM_PROMPT,
+    CODE_AGENT_TOOLS,
     DEFAULT_ENDPOINT,
     PROVIDER_ENV_MAP,
     resolve_endpoint,
@@ -117,11 +119,15 @@ def cmd_run(args) -> None:
             output = run_moa(agents, aggregator, **common)
 
         elif args.workflow == "react":
+            code_agent = getattr(args, "code_agent", False)
+            allow_shell = getattr(args, "allow_shell", False)
             output = run_react(
                 agents[0],
                 **common,
-                enabled_tools=args.tools,
+                enabled_tools=args.tools if args.tools else (CODE_AGENT_TOOLS if code_agent else None),
                 max_steps=args.max_steps,
+                system_prompt=CODE_AGENT_SYSTEM_PROMPT if code_agent else None,
+                allow_shell=allow_shell,
             )
 
         else:
@@ -195,7 +201,10 @@ def main() -> None:
 
     # Image / prompt
     run_parser.add_argument("--prompt", "-p", type=str, default="What's in this image?")
-    run_parser.add_argument("--images", "-i", type=str, nargs="+", required=True, help="Image paths or URLs")
+    run_parser.add_argument(
+        "--images", "-i", type=str, nargs="*", default=[],
+        help="Image paths or URLs (optional; not required for code-agent mode)",
+    )
     run_parser.add_argument("--detail", "-d", type=str, default="low", choices=["auto", "low", "high"])
     run_parser.add_argument("--tokens", "-t", type=int, default=300, help="Max tokens per response")
     run_parser.add_argument("--resize", "-r", action="store_true", help="Resize images with padding")
@@ -250,6 +259,19 @@ def main() -> None:
         help=f"ReAct tools to enable. Available: {list(BUILTIN_TOOLS.keys())}",
     )
     run_parser.add_argument("--max-steps", type=int, default=5)
+    run_parser.add_argument(
+        "--code-agent",
+        action="store_true",
+        help=(
+            "Enable code-agent mode: uses filesystem/shell tools and a coding-focused system prompt. "
+            f"Default tools: {CODE_AGENT_TOOLS}"
+        ),
+    )
+    run_parser.add_argument(
+        "--allow-shell",
+        action="store_true",
+        help="Allow run_bash tool to execute shell commands (opt-in for safety).",
+    )
 
     run_parser.set_defaults(func=cmd_run)
 
@@ -286,7 +308,7 @@ def main() -> None:
     # Handle legacy mode (no subcommand) for backward compatibility
     if args.command is None:
         # Check if any run-specific args were provided
-        if "--images" in sys.argv or "-i" in sys.argv:
+        if "--images" in sys.argv or "-i" in sys.argv or "--prompt" in sys.argv or "-p" in sys.argv:
             # Legacy mode: parse as run command
             sys.argv.insert(1, "run")
             args = parser.parse_args()

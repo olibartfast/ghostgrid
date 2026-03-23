@@ -2,7 +2,7 @@
 
 import pytest
 
-from vlm_agent_gateway.cli import build_agents
+from vlm_agent_gateway.cli import build_agents, main
 
 
 def test_build_agents_uses_provider_specific_default_endpoints(monkeypatch):
@@ -26,3 +26,105 @@ def test_build_agents_rejects_azure_without_endpoint(monkeypatch):
 
     with pytest.raises(RuntimeError, match="requires an explicit --endpoint"):
         build_agents(models=["gpt-5.2"], providers=["azure"], endpoints=[])
+
+
+# ---------------------------------------------------------------------------
+# CLI flag tests: --code-agent, --allow-shell, optional --images
+# ---------------------------------------------------------------------------
+
+def test_cli_images_optional_for_react(monkeypatch, capsys):
+    """--images should not be required when running react workflow."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+
+    def fake_run_react(*args, **kwargs):
+        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
+                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+
+    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+
+    import sys
+    monkeypatch.setattr(
+        sys, "argv",
+        ["vlm-agent-gateway", "run", "--workflow", "react",
+         "--model", "gpt-4o", "--prompt", "list files",
+         "--tools", "list_directory"],
+    )
+    main()
+    out = capsys.readouterr().out
+    assert "react" in out
+
+
+def test_cli_code_agent_flag_selects_code_tools(monkeypatch, capsys):
+    """--code-agent should activate CODE_AGENT_TOOLS and CODE_AGENT_SYSTEM_PROMPT."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    captured = {}
+
+    def fake_run_react(*args, **kwargs):
+        captured["enabled_tools"] = kwargs.get("enabled_tools")
+        captured["system_prompt"] = kwargs.get("system_prompt")
+        captured["allow_shell"] = kwargs.get("allow_shell")
+        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
+                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+
+    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+
+    import sys
+    from vlm_agent_gateway.config import CODE_AGENT_TOOLS, CODE_AGENT_SYSTEM_PROMPT
+    monkeypatch.setattr(
+        sys, "argv",
+        ["vlm-agent-gateway", "run", "--workflow", "react",
+         "--model", "gpt-4o", "--prompt", "fix bug", "--code-agent"],
+    )
+    main()
+
+    assert set(captured["enabled_tools"]) == set(CODE_AGENT_TOOLS)
+    assert captured["system_prompt"] == CODE_AGENT_SYSTEM_PROMPT
+    assert captured["allow_shell"] is False
+
+
+def test_cli_allow_shell_flag(monkeypatch, capsys):
+    """--allow-shell should pass allow_shell=True to run_react."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    captured = {}
+
+    def fake_run_react(*args, **kwargs):
+        captured["allow_shell"] = kwargs.get("allow_shell")
+        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
+                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+
+    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+
+    import sys
+    monkeypatch.setattr(
+        sys, "argv",
+        ["vlm-agent-gateway", "run", "--workflow", "react",
+         "--model", "gpt-4o", "--prompt", "run build",
+         "--code-agent", "--allow-shell"],
+    )
+    main()
+
+    assert captured["allow_shell"] is True
+
+
+def test_cli_explicit_tools_override_code_agent_defaults(monkeypatch, capsys):
+    """When --tools is set alongside --code-agent, explicit tools take priority."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    captured = {}
+
+    def fake_run_react(*args, **kwargs):
+        captured["enabled_tools"] = kwargs.get("enabled_tools")
+        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
+                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+
+    monkeypatch.setattr("vlm_agent_gateway.cli.run_react", fake_run_react)
+
+    import sys
+    monkeypatch.setattr(
+        sys, "argv",
+        ["vlm-agent-gateway", "run", "--workflow", "react",
+         "--model", "gpt-4o", "--prompt", "read only",
+         "--code-agent", "--tools", "read_file"],
+    )
+    main()
+
+    assert captured["enabled_tools"] == ["read_file"]
