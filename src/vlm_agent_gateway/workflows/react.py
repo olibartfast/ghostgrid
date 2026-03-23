@@ -24,6 +24,8 @@ def run_react(
     target_size: tuple[int, int],
     enabled_tools: list[str] | None = None,
     max_steps: int = 5,
+    system_prompt: str | None = None,
+    allow_shell: bool = False,
 ) -> dict:
     """
     Execute ReAct reasoning loop with tool calling.
@@ -41,8 +43,8 @@ def run_react(
         raise ValueError(f"No valid tools enabled. Available: {list(BUILTIN_TOOLS.keys())}")
 
     tool_descriptions = "\n".join(f"  {t.name}: {t.description} | parameters: {t.parameters}" for t in tools.values())
-    system_prompt = REACT_SYSTEM_PROMPT.format(tool_descriptions=tool_descriptions)
-    conversation = f"{system_prompt}\n\nQuestion: {prompt}\n"
+    base_prompt = system_prompt if system_prompt is not None else REACT_SYSTEM_PROMPT
+    conversation = f"{base_prompt.format(tool_descriptions=tool_descriptions)}\n\nQuestion: {prompt}\n"
 
     steps = []
     final_answer = None
@@ -65,7 +67,8 @@ def run_react(
         else:
             try:
                 observation = tools[action].fn(
-                    agent, image_paths, detail, max_tokens, resize, target_size, **action_input
+                    agent, image_paths, detail, max_tokens, resize, target_size,
+                    allow_shell=allow_shell, **action_input
                 )
             except Exception as exc:
                 observation = f"Tool '{action}' raised an error: {exc}"

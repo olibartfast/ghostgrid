@@ -34,6 +34,9 @@ DEFAULT_ENDPOINT = "https://api.openai.com/v1/chat/completions"
 
 WORKFLOW_CHOICES = ["sequential", "parallel", "conditional", "iterative", "moa", "react", "monitor"]
 
+# Tools available in code-agent mode
+CODE_AGENT_TOOLS = ["read_file", "write_file", "list_directory", "run_bash", "search_files"]
+
 # ---------------------------------------------------------------------------
 # ReAct system prompt template
 # ---------------------------------------------------------------------------
@@ -57,6 +60,33 @@ Rules:
 - Only call one tool per step.
 - Always wait for the Observation before continuing.
 - Never fabricate an Observation — the system provides it.
+- Stop as soon as you can write Final Answer."""
+
+# ---------------------------------------------------------------------------
+# Code-agent system prompt template (filesystem + shell tools)
+# ---------------------------------------------------------------------------
+
+CODE_AGENT_SYSTEM_PROMPT = """You are a coding agent with access to the local filesystem. Solve the task step by step using the available tools.
+
+Available tools:
+{tool_descriptions}
+
+Use this EXACT format for every step:
+Thought: <your reasoning about what to do next>
+Action: <tool_name>
+Action Input: <JSON object with the tool's parameters>
+Observation: <result will be filled in by the system>
+
+Once you have completed the task, end with:
+Thought: I have completed the task.
+Final Answer: <summary of what was done or the answer to the question>
+
+Rules:
+- Only call one tool per step.
+- Always wait for the Observation before continuing.
+- Never fabricate an Observation — the system provides it.
+- Read files before editing them to understand existing content.
+- Use search_files to locate relevant code before making changes.
 - Stop as soon as you can write Final Answer."""
 
 # ---------------------------------------------------------------------------
