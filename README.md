@@ -129,26 +129,26 @@ The `react` workflow exposes a registry of tools the agent can invoke at each st
 
 ```bash
 # Explore a codebase and answer a question (safe, no shell)
-vlm-agent-gateway run --workflow react \
+agent-gateway run --workflow react \
     --prompt "What does the run_react function do? Read the relevant source files." \
     --model claude-3-5-sonnet-20241022 \
     --provider anthropic \
     --code-agent
 
 # Write a new feature (reads existing files, writes new ones)
-vlm-agent-gateway run --workflow react \
+agent-gateway run --workflow react \
     --prompt "Add a hello_world() function to src/utils.py" \
     --model gpt-5.2 \
     --code-agent
 
 # Run tests and fix failures (shell enabled)
-vlm-agent-gateway run --workflow react \
+agent-gateway run --workflow react \
     --prompt "Run pytest and fix any failing tests" \
     --model gpt-5.2 \
     --code-agent --allow-shell --max-steps 10
 
 # Combine vision + code: analyse a screenshot then write code based on it
-vlm-agent-gateway run --workflow react \
+agent-gateway run --workflow react \
     --prompt "Read the UI shown in the screenshot and generate matching HTML" \
     --images screenshot.png \
     --model gpt-5.2 \
