@@ -1,8 +1,6 @@
 """Tests for the ReAct workflow — new system_prompt and allow_shell parameters."""
 
-import pytest
-
-from multimodal_agent_gateway.config import CODE_AGENT_SYSTEM_PROMPT, REACT_SYSTEM_PROMPT
+from multimodal_agent_gateway.config import CODE_AGENT_SYSTEM_PROMPT
 from multimodal_agent_gateway.models import Agent, AgentResult
 from multimodal_agent_gateway.workflows.react import run_react
 

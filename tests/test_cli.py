@@ -71,7 +71,7 @@ def test_cli_code_agent_flag_selects_code_tools(monkeypatch, capsys):
 
     monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
-    from multimodal_agent_gateway.config import CODE_AGENT_TOOLS, CODE_AGENT_SYSTEM_PROMPT
+    from multimodal_agent_gateway.config import CODE_AGENT_SYSTEM_PROMPT, CODE_AGENT_TOOLS
     monkeypatch.setattr(
         sys, "argv",
         ["agent-gateway", "run", "--workflow", "react",

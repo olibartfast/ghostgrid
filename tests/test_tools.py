@@ -1,9 +1,5 @@
 """Tests for built-in ReAct tools (filesystem, shell, and vision stubs)."""
 
-import os
-
-import pytest
-
 from multimodal_agent_gateway.models import Agent
 from multimodal_agent_gateway.tools import BUILTIN_TOOLS
 from multimodal_agent_gateway.tools.builtin import (
@@ -28,7 +24,7 @@ def _agent() -> Agent:
     )
 
 
-_COMMON = dict(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512))
+_COMMON = {"image_paths": [], "detail": "low", "max_tokens": 256, "resize": False, "target_size": (512, 512)}
 
 
 # ---------------------------------------------------------------------------
