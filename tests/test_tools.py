@@ -10,10 +10,10 @@ from multimodal_agent_gateway.tools.builtin import (
     _tool_write_file,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _agent() -> Agent:
     return Agent(
@@ -31,6 +31,7 @@ _COMMON = {"image_paths": [], "detail": "low", "max_tokens": 256, "resize": Fals
 # Tool registry
 # ---------------------------------------------------------------------------
 
+
 def test_builtin_tools_contains_filesystem_tools():
     for name in ("read_file", "write_file", "list_directory", "run_bash", "search_files"):
         assert name in BUILTIN_TOOLS, f"'{name}' missing from BUILTIN_TOOLS"
@@ -44,6 +45,7 @@ def test_builtin_tools_contains_vision_tools():
 # ---------------------------------------------------------------------------
 # read_file
 # ---------------------------------------------------------------------------
+
 
 def test_read_file_returns_content(tmp_path):
     f = tmp_path / "hello.txt"
@@ -65,6 +67,7 @@ def test_read_file_nonexistent_file():
 # ---------------------------------------------------------------------------
 # write_file
 # ---------------------------------------------------------------------------
+
 
 def test_write_file_creates_file(tmp_path):
     dest = tmp_path / "out.txt"
@@ -95,6 +98,7 @@ def test_write_file_missing_path_param():
 # list_directory
 # ---------------------------------------------------------------------------
 
+
 def test_list_directory_shows_files_and_dirs(tmp_path):
     (tmp_path / "file.txt").write_text("x")
     (tmp_path / "subdir").mkdir()
@@ -124,6 +128,7 @@ def test_list_directory_defaults_to_cwd():
 # run_bash
 # ---------------------------------------------------------------------------
 
+
 def test_run_bash_blocked_without_allow_shell():
     result = _tool_run_bash(_agent(), **_COMMON, command="echo hi", allow_shell=False)
     assert "disabled" in result.lower() or "--allow-shell" in result
@@ -141,9 +146,7 @@ def test_run_bash_executes_with_allow_shell():
 
 
 def test_run_bash_captures_stderr_with_allow_shell():
-    result = _tool_run_bash(
-        _agent(), **_COMMON, command="echo err >&2", allow_shell=True
-    )
+    result = _tool_run_bash(_agent(), **_COMMON, command="echo err >&2", allow_shell=True)
     assert "err" in result
 
 
@@ -155,6 +158,7 @@ def test_run_bash_missing_command_param():
 # ---------------------------------------------------------------------------
 # search_files
 # ---------------------------------------------------------------------------
+
 
 def test_search_files_finds_pattern(tmp_path):
     (tmp_path / "a.txt").write_text("hello world\nfoo bar\n")
@@ -185,6 +189,7 @@ def test_search_files_truncates_large_output(tmp_path, monkeypatch):
         class R:
             stdout = fake_output
             stderr = ""
+
         return R()
 
     monkeypatch.setattr(subprocess, "run", fake_run)

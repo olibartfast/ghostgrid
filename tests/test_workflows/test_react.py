@@ -29,6 +29,7 @@ def _make_result(agent: Agent, content: str) -> AgentResult:
 # system_prompt parameter
 # ---------------------------------------------------------------------------
 
+
 def test_run_react_uses_default_system_prompt(monkeypatch):
     """When system_prompt is not provided, REACT_SYSTEM_PROMPT is used."""
     agent = _agent()
@@ -114,11 +115,11 @@ def test_run_react_code_agent_prompt(monkeypatch):
 # allow_shell parameter
 # ---------------------------------------------------------------------------
 
+
 def test_run_react_allow_shell_false_blocks_run_bash(monkeypatch):
     """Without allow_shell the run_bash tool should return the blocked message."""
     agent = _agent()
     call_count = iter(range(100))
-    observations = []
 
     def fake_run_agent(ag, conversation, *args, **kwargs):
         n = next(call_count)
@@ -155,7 +156,9 @@ def test_run_react_allow_shell_true_executes_run_bash(monkeypatch):
     def fake_run_agent(ag, conversation, *args, **kwargs):
         n = next(call_count)
         if n == 0:
-            return _make_result(ag, 'Thought: run shell\nAction: run_bash\nAction Input: {"command": "echo hello-test"}')
+            return _make_result(
+                ag, 'Thought: run shell\nAction: run_bash\nAction Input: {"command": "echo hello-test"}'
+            )
         return _make_result(ag, "Thought: done\nFinal Answer: ran")
 
     monkeypatch.setattr("multimodal_agent_gateway.workflows.react.run_agent", fake_run_agent)
@@ -179,6 +182,7 @@ def test_run_react_allow_shell_true_executes_run_bash(monkeypatch):
 # ---------------------------------------------------------------------------
 # Backward compatibility: old callers without new params still work
 # ---------------------------------------------------------------------------
+
 
 def test_run_react_backward_compatible_no_new_params(monkeypatch):
     """run_react works without system_prompt / allow_shell (backward compat)."""

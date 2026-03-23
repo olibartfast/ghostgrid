@@ -76,6 +76,7 @@ def test_get_api_key_missing():
 # Code-agent config additions
 # ---------------------------------------------------------------------------
 
+
 def test_code_agent_tools_contains_expected_tools():
     """CODE_AGENT_TOOLS must include all filesystem/shell tools."""
     expected = {"read_file", "write_file", "list_directory", "run_bash", "search_files"}
@@ -90,6 +91,7 @@ def test_code_agent_system_prompt_has_placeholder():
 def test_code_agent_system_prompt_is_distinct_from_react_prompt():
     """The code-agent prompt should be different from the vision ReAct prompt."""
     from multimodal_agent_gateway.config import REACT_SYSTEM_PROMPT
+
     assert CODE_AGENT_SYSTEM_PROMPT != REACT_SYSTEM_PROMPT
 
 

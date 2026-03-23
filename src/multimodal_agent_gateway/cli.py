@@ -200,7 +200,11 @@ def main() -> None:
     # Image / prompt
     run_parser.add_argument("--prompt", "-p", type=str, default="What's in this input?")
     run_parser.add_argument(
-        "--images", "-i", type=str, nargs="*", default=[],
+        "--images",
+        "-i",
+        type=str,
+        nargs="*",
+        default=[],
         help="Image paths or URLs (optional; not required for code-agent mode or text-only runs)",
     )
     run_parser.add_argument("--detail", "-d", type=str, default="low", choices=["auto", "low", "high"])

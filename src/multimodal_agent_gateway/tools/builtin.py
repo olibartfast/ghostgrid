@@ -8,9 +8,7 @@ import subprocess
 from multimodal_agent_gateway.models import Agent, Tool
 from multimodal_agent_gateway.providers import run_agent
 
-_SHELL_BLOCKED = (
-    "Shell execution is disabled. Re-run with --allow-shell to enable run_bash."
-)
+_SHELL_BLOCKED = "Shell execution is disabled. Re-run with --allow-shell to enable run_bash."
 
 
 def _tool_describe(

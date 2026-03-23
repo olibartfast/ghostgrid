@@ -67,8 +67,7 @@ def run_react(
         else:
             try:
                 observation = tools[action].fn(
-                    agent, image_paths, detail, max_tokens, resize, target_size,
-                    allow_shell=allow_shell, **action_input
+                    agent, image_paths, detail, max_tokens, resize, target_size, allow_shell=allow_shell, **action_input
                 )
             except Exception as exc:
                 observation = f"Tool '{action}' raised an error: {exc}"
