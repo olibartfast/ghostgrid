@@ -8,14 +8,14 @@ Input ──► [Agent-3] ─┘
 
 import concurrent.futures
 
-from vlm_agent_gateway.models import Agent
-from vlm_agent_gateway.providers import run_agent
+from multimodal_agent_gateway.models import Agent
+from multimodal_agent_gateway.providers import run_agent
 
 
 def run_parallel(
     agents: list[Agent],
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     detail: str,
     max_tokens: int,
     resize: bool,

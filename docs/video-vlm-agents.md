@@ -144,7 +144,7 @@ monitoring pipeline:
 
 ```bash
 # Fall detection
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video ./elderly_room.mp4 \
     --alert-prompt "Is anyone falling, lying on the floor, or in distress?" \
     --provider google \
@@ -152,7 +152,7 @@ vlm-agent-gateway monitor \
     --fps 1 --max-frames 30
 
 # Continuous webcam monitoring with local vLLM
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video 0 \
     --provider openai \
     --endpoint http://localhost:8000/v1/chat/completions \
@@ -165,7 +165,7 @@ vlm-agent-gateway monitor \
 ### Example: Security Monitoring
 
 ```bash
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video rtsp://camera.local:554/stream \
     --provider google \
     --model gemini-2.5-flash \
@@ -176,7 +176,7 @@ vlm-agent-gateway monitor \
 ### Example: Industrial Safety
 
 ```bash
-vlm-agent-gateway monitor \
+agent-gateway monitor \
     --video ./factory_floor.mp4 \
     --provider openai \
     --model gpt-5.2 \
@@ -186,7 +186,7 @@ vlm-agent-gateway monitor \
 
 ---
 
-## Integration with vlm-agent-gateway Workflows
+## Integration with multimodal-agent-gateway Workflows
 
 The monitoring agent is a standalone script, but it's designed to compose
 with the gateway's workflow patterns:
@@ -199,7 +199,7 @@ Run the same frames through multiple VLMs and aggregate:
 # Step 1: Extract frames once, run through multiple models
 # Step 2: Use the gateway's MoA mode with an aggregator
 
-python vlm-agent-gateway/main.py \
+agent-gateway run \
     --workflow moa \
     --prompt "Is anyone in this scene falling or in distress?" \
     --images frame_001.jpg frame_002.jpg frame_003.jpg \
@@ -215,7 +215,7 @@ python vlm-agent-gateway/main.py \
 First detect → then classify → then assess severity:
 
 ```bash
-python vlm-agent-gateway/main.py \
+agent-gateway run \
     --workflow sequential \
     --prompt "Analyze these surveillance frames for safety incidents" \
     --images frame_*.jpg \

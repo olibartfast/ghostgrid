@@ -4,9 +4,9 @@ import os
 
 import pytest
 
-from vlm_agent_gateway.models import Agent
-from vlm_agent_gateway.tools import BUILTIN_TOOLS
-from vlm_agent_gateway.tools.builtin import (
+from multimodal_agent_gateway.models import Agent
+from multimodal_agent_gateway.tools import BUILTIN_TOOLS
+from multimodal_agent_gateway.tools.builtin import (
     _tool_list_directory,
     _tool_read_file,
     _tool_run_bash,

@@ -10,14 +10,14 @@ prompt ──► [Agent] ──► output-1
                        final output
 """
 
-from vlm_agent_gateway.models import Agent
-from vlm_agent_gateway.providers import run_agent
+from multimodal_agent_gateway.models import Agent
+from multimodal_agent_gateway.providers import run_agent
 
 
 def run_iterative(
     agent: Agent,
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     detail: str,
     max_tokens: int,
     resize: bool,

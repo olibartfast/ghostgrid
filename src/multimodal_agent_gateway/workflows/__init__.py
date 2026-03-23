@@ -1,18 +1,16 @@
-"""
-Workflows package - All VLM workflow implementations.
-"""
+"""Workflows package for text, vision, and multimodal execution patterns."""
 
-from vlm_agent_gateway.workflows.conditional import run_conditional
-from vlm_agent_gateway.workflows.iterative import run_iterative
-from vlm_agent_gateway.workflows.moa import run_moa
-from vlm_agent_gateway.workflows.monitoring import (
+from multimodal_agent_gateway.workflows.conditional import run_conditional
+from multimodal_agent_gateway.workflows.iterative import run_iterative
+from multimodal_agent_gateway.workflows.moa import run_moa
+from multimodal_agent_gateway.workflows.monitoring import (
     run_continuous_monitoring,
     run_monitoring,
     run_monitoring_cycle,
 )
-from vlm_agent_gateway.workflows.parallel import run_parallel
-from vlm_agent_gateway.workflows.react import run_react
-from vlm_agent_gateway.workflows.sequential import run_sequential
+from multimodal_agent_gateway.workflows.parallel import run_parallel
+from multimodal_agent_gateway.workflows.react import run_react
+from multimodal_agent_gateway.workflows.sequential import run_sequential
 
 # Workflow registry for CLI dispatch
 WORKFLOW_REGISTRY = {

@@ -1,5 +1,5 @@
 """
-Data models (dataclasses) for the VLM Agent Gateway.
+Data models (dataclasses) for the Multimodal Agent Gateway.
 """
 
 import uuid
@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Agent:
-    """Configuration for a single VLM agent."""
+    """Configuration for a single LLM or VLM agent."""
 
     model: str
     endpoint: str

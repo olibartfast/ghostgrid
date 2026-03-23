@@ -8,16 +8,16 @@ prompt ──► [Agent: Thought + Action] ──► tool call
                        ──► Final Answer
 """
 
-from vlm_agent_gateway.config import REACT_SYSTEM_PROMPT
-from vlm_agent_gateway.models import Agent, Tool
-from vlm_agent_gateway.providers import run_agent
-from vlm_agent_gateway.tools import BUILTIN_TOOLS, _parse_react_step
+from multimodal_agent_gateway.config import REACT_SYSTEM_PROMPT
+from multimodal_agent_gateway.models import Agent, Tool
+from multimodal_agent_gateway.providers import run_agent
+from multimodal_agent_gateway.tools import BUILTIN_TOOLS, _parse_react_step
 
 
 def run_react(
     agent: Agent,
     prompt: str,
-    image_paths: list[str],
+    image_paths: list[str] | None,
     detail: str,
     max_tokens: int,
     resize: bool,
