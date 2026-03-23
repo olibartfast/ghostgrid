@@ -36,21 +36,39 @@ def test_build_agents_rejects_azure_without_endpoint(monkeypatch):
 # CLI flag tests: --code-agent, --allow-shell, optional --images
 # ---------------------------------------------------------------------------
 
+
 def test_cli_images_optional_for_react(monkeypatch, capsys):
     """--images should not be required when running react workflow."""
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
 
     def fake_run_react(*args, **kwargs):
-        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
-                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+        return {
+            "workflow": "react",
+            "content": "ok",
+            "steps": [],
+            "total_steps": 0,
+            "stop_reason": "final_answer",
+            "model": "m",
+            "provider": "openai",
+        }
 
     monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
     monkeypatch.setattr(
-        sys, "argv",
-        ["agent-gateway", "run", "--workflow", "react",
-         "--model", "gpt-4o", "--prompt", "list files",
-         "--tools", "list_directory"],
+        sys,
+        "argv",
+        [
+            "agent-gateway",
+            "run",
+            "--workflow",
+            "react",
+            "--model",
+            "gpt-4o",
+            "--prompt",
+            "list files",
+            "--tools",
+            "list_directory",
+        ],
     )
     main()
     out = capsys.readouterr().out
@@ -66,16 +84,24 @@ def test_cli_code_agent_flag_selects_code_tools(monkeypatch, capsys):
         captured["enabled_tools"] = kwargs.get("enabled_tools")
         captured["system_prompt"] = kwargs.get("system_prompt")
         captured["allow_shell"] = kwargs.get("allow_shell")
-        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
-                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+        return {
+            "workflow": "react",
+            "content": "ok",
+            "steps": [],
+            "total_steps": 0,
+            "stop_reason": "final_answer",
+            "model": "m",
+            "provider": "openai",
+        }
 
     monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
     from multimodal_agent_gateway.config import CODE_AGENT_SYSTEM_PROMPT, CODE_AGENT_TOOLS
+
     monkeypatch.setattr(
-        sys, "argv",
-        ["agent-gateway", "run", "--workflow", "react",
-         "--model", "gpt-4o", "--prompt", "fix bug", "--code-agent"],
+        sys,
+        "argv",
+        ["agent-gateway", "run", "--workflow", "react", "--model", "gpt-4o", "--prompt", "fix bug", "--code-agent"],
     )
     main()
 
@@ -91,16 +117,33 @@ def test_cli_allow_shell_flag(monkeypatch, capsys):
 
     def fake_run_react(*args, **kwargs):
         captured["allow_shell"] = kwargs.get("allow_shell")
-        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
-                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+        return {
+            "workflow": "react",
+            "content": "ok",
+            "steps": [],
+            "total_steps": 0,
+            "stop_reason": "final_answer",
+            "model": "m",
+            "provider": "openai",
+        }
 
     monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
     monkeypatch.setattr(
-        sys, "argv",
-        ["agent-gateway", "run", "--workflow", "react",
-         "--model", "gpt-4o", "--prompt", "run build",
-         "--code-agent", "--allow-shell"],
+        sys,
+        "argv",
+        [
+            "agent-gateway",
+            "run",
+            "--workflow",
+            "react",
+            "--model",
+            "gpt-4o",
+            "--prompt",
+            "run build",
+            "--code-agent",
+            "--allow-shell",
+        ],
     )
     main()
 
@@ -114,16 +157,34 @@ def test_cli_explicit_tools_override_code_agent_defaults(monkeypatch, capsys):
 
     def fake_run_react(*args, **kwargs):
         captured["enabled_tools"] = kwargs.get("enabled_tools")
-        return {"workflow": "react", "content": "ok", "steps": [], "total_steps": 0,
-                "stop_reason": "final_answer", "model": "m", "provider": "openai"}
+        return {
+            "workflow": "react",
+            "content": "ok",
+            "steps": [],
+            "total_steps": 0,
+            "stop_reason": "final_answer",
+            "model": "m",
+            "provider": "openai",
+        }
 
     monkeypatch.setattr("multimodal_agent_gateway.cli.run_react", fake_run_react)
 
     monkeypatch.setattr(
-        sys, "argv",
-        ["agent-gateway", "run", "--workflow", "react",
-         "--model", "gpt-4o", "--prompt", "read only",
-         "--code-agent", "--tools", "read_file"],
+        sys,
+        "argv",
+        [
+            "agent-gateway",
+            "run",
+            "--workflow",
+            "react",
+            "--model",
+            "gpt-4o",
+            "--prompt",
+            "read only",
+            "--code-agent",
+            "--tools",
+            "read_file",
+        ],
     )
     main()
 
