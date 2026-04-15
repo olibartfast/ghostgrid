@@ -252,25 +252,6 @@ print(result["content"])
 - `examples/together_nemotron_reasoning.py` runs NVIDIA Nemotron 3 Super on Together AI for text-only reasoning and long-context tasks.
 - `examples/multi_model_analysis.py`, `examples/fall_detection.py`, and `examples/security_monitoring.py` cover MoA and monitoring flows.
 
-## C++ Client
-
-A lightweight C++ client for single-shot OpenAI-compatible inference.
-
-```bash
-cd vlm-inference-client/cpp
-mkdir build && cd build
-cmake .. && make
-
-./vlm-inference-client \
-    --prompt "Describe this image" \
-    --images image.jpg \
-    --model gpt-5.2 \
-    --api_endpoint https://api.openai.com/v1/chat/completions \
-    --api_key_env OPENAI_API_KEY
-```
-
-See [vlm-inference-client/cpp/Readme.md](vlm-inference-client/cpp/Readme.md) for details.
-
 ## Documentation
 
 - [Video VLM Agents Guide](docs/video-vlm-agents.md) - Video-capable VLMs, vLLM deployment, hardware sizing

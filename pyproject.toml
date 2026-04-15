@@ -62,7 +62,6 @@ exclude = [
     "/tests",
     "/examples",
     "/docs",
-    "/vlm-inference-client",
 ]
 
 [tool.hatch.build.targets.wheel]
