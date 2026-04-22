@@ -1,5 +1,7 @@
 # ghostgrid
 
+![Alt text](data/ghostgrid.png)
+
 > A grid for multimodal agents — route vision, text, and code across providers through one gateway.
 
 Multi-provider LLM and VLM inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring — including **code-agent mode** (filesystem + shell tools, similar to Claude Code / OpenAI Codex).
