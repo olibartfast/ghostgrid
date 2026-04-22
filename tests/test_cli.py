@@ -198,10 +198,10 @@ def test_main_allows_text_only_run(monkeypatch, capsys):
         cli,
         "WORKFLOW_REGISTRY",
         {
-            "sequential": lambda agents, **kwargs: {
+            "sequential": lambda agents, prompt, config: {
                 "workflow": "sequential",
                 "content": "ok",
-                "image_paths": kwargs["image_paths"],
+                "image_paths": config.image_paths,
             }
         },
     )

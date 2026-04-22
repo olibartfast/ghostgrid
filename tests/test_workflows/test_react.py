@@ -1,7 +1,7 @@
 """Tests for the ReAct workflow — new system_prompt and allow_shell parameters."""
 
 from ghostgrid.config import CODE_AGENT_SYSTEM_PROMPT
-from ghostgrid.models import Agent, AgentResult
+from ghostgrid.models import Agent, AgentResult, InferenceConfig
 from ghostgrid.workflows.react import run_react
 
 
@@ -44,11 +44,7 @@ def test_run_react_uses_default_system_prompt(monkeypatch):
     result = run_react(
         agent,
         prompt="describe image",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["describe"],
     )
 
@@ -72,11 +68,7 @@ def test_run_react_uses_custom_system_prompt(monkeypatch):
     run_react(
         agent,
         prompt="do something",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["list_directory"],
         system_prompt=custom,
     )
@@ -99,11 +91,7 @@ def test_run_react_code_agent_prompt(monkeypatch):
     run_react(
         agent,
         prompt="fix the bug",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["read_file"],
         system_prompt=CODE_AGENT_SYSTEM_PROMPT,
     )
@@ -134,11 +122,7 @@ def test_run_react_allow_shell_false_blocks_run_bash(monkeypatch):
     result = run_react(
         agent,
         prompt="run bash",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["run_bash"],
         allow_shell=False,
     )
@@ -166,11 +150,7 @@ def test_run_react_allow_shell_true_executes_run_bash(monkeypatch):
     result = run_react(
         agent,
         prompt="run bash",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["run_bash"],
         allow_shell=True,
     )
@@ -196,11 +176,7 @@ def test_run_react_backward_compatible_no_new_params(monkeypatch):
     result = run_react(
         agent,
         prompt="hello",
-        image_paths=[],
-        detail="low",
-        max_tokens=256,
-        resize=False,
-        target_size=(512, 512),
+        config=InferenceConfig(image_paths=[], detail="low", max_tokens=256, resize=False, target_size=(512, 512)),
         enabled_tools=["describe"],
     )
 

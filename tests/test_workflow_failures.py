@@ -2,7 +2,7 @@
 
 import pytest
 
-from ghostgrid.models import Agent, AgentResult
+from ghostgrid.models import Agent, AgentResult, InferenceConfig
 from ghostgrid.workflows.iterative import run_iterative
 from ghostgrid.workflows.moa import run_moa
 
@@ -48,11 +48,9 @@ def test_iterative_raises_when_evaluator_fails(monkeypatch):
         run_iterative(
             agent,
             prompt="Describe the image",
-            image_paths=["image.jpg"],
-            detail="low",
-            max_tokens=100,
-            resize=False,
-            target_size=(512, 512),
+            config=InferenceConfig(
+                image_paths=["image.jpg"], detail="low", max_tokens=100, resize=False, target_size=(512, 512)
+            ),
             evaluator_agent=evaluator,
         )
 
@@ -99,9 +97,7 @@ def test_moa_raises_when_aggregator_fails(monkeypatch):
             proposer_agents=[proposer_a, proposer_b],
             aggregator_agent=aggregator,
             prompt="Compare these frames",
-            image_paths=["frame1.jpg"],
-            detail="low",
-            max_tokens=100,
-            resize=False,
-            target_size=(512, 512),
+            config=InferenceConfig(
+                image_paths=["frame1.jpg"], detail="low", max_tokens=100, resize=False, target_size=(512, 512)
+            ),
         )
