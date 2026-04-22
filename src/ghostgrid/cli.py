@@ -14,7 +14,7 @@ from ghostgrid.config import (
     PROVIDER_ENV_MAP,
     resolve_endpoint,
 )
-from ghostgrid.models import Agent
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.tools import BUILTIN_TOOLS
 from ghostgrid.workflows import (
     WORKFLOW_REGISTRY,
@@ -60,7 +60,16 @@ def build_agents(models: list[str], providers: list[str], endpoints: list[str]) 
     return [make_agent(m, p, e) for m, p, e in zip(models, providers, endpoints, strict=True)]
 
 
-def cmd_run(args) -> None:
+def _make_role_agent(model, provider, endpoint, agents: list[Agent]) -> Agent:
+    """Create an agent falling back to agents[0] attrs when args are unset."""
+    return make_agent(
+        model or agents[0].model,
+        provider or agents[0].provider,
+        endpoint or agents[0].endpoint,
+    )
+
+
+def cmd_run(args) -> None:  # pylint: disable=too-many-locals
     """Handle standard workflow commands."""
     correlation_id = str(uuid.uuid4())[:12]
 
@@ -69,63 +78,53 @@ def cmd_run(args) -> None:
         providers = args.providers or [args.provider] * len(models)
         endpoints = args.endpoints or [args.url] * len(models)
         agents = build_agents(models, providers, endpoints)
-
-        common = {
-            "prompt": args.prompt,
-            "image_paths": args.images or [],
-            "detail": args.detail,
-            "max_tokens": args.tokens,
-            "resize": args.resize,
-            "target_size": tuple(args.size),
-        }
+        prompt = args.prompt
+        config = InferenceConfig(
+            image_paths=args.images or [],
+            detail=args.detail,
+            max_tokens=args.tokens,
+            resize=args.resize,
+            target_size=tuple(args.size),
+        )
 
         if args.workflow == "sequential":
-            output = WORKFLOW_REGISTRY["sequential"](agents, **common)
+            output = WORKFLOW_REGISTRY["sequential"](agents, prompt, config)
 
         elif args.workflow == "parallel":
-            output = WORKFLOW_REGISTRY["parallel"](agents, **common)
+            output = WORKFLOW_REGISTRY["parallel"](agents, prompt, config)
 
         elif args.workflow == "conditional":
-            router_model = args.router_model or agents[0].model
-            router_provider = args.router_provider or agents[0].provider
-            router_endpoint = args.router_endpoint or agents[0].endpoint
-            router = make_agent(router_model, router_provider, router_endpoint)
+            router = _make_role_agent(args.router_model, args.router_provider, args.router_endpoint, agents)
             if len(args.categories) != len(agents):
                 raise ValueError(f"--categories ({len(args.categories)}) must match --models ({len(agents)})")
-            output = run_conditional(router, agents, args.categories, **common)
+            output = run_conditional(router, agents, args.categories, prompt, config)
 
         elif args.workflow == "iterative":
             evaluator = None
             if args.evaluator_model:
-                evaluator = make_agent(
-                    args.evaluator_model,
-                    args.evaluator_provider or agents[0].provider,
-                    args.evaluator_endpoint or agents[0].endpoint,
+                evaluator = _make_role_agent(
+                    args.evaluator_model, args.evaluator_provider, args.evaluator_endpoint, agents
                 )
             output = run_iterative(
-                agents[0],
-                **common,
-                evaluator_agent=evaluator,
-                max_iterations=args.max_iterations,
+                agents[0], prompt, config, evaluator_agent=evaluator, max_iterations=args.max_iterations
             )
 
         elif args.workflow == "moa":
-            agg_model = args.aggregator_model or agents[0].model
-            agg_provider = args.aggregator_provider or agents[0].provider
-            agg_endpoint = args.aggregator_endpoint or agents[0].endpoint
-            aggregator = make_agent(agg_model, agg_provider, agg_endpoint)
-            output = run_moa(agents, aggregator, **common)
+            aggregator = _make_role_agent(
+                args.aggregator_model, args.aggregator_provider, args.aggregator_endpoint, agents
+            )
+            output = run_moa(agents, aggregator, prompt, config)
 
         elif args.workflow == "react":
             code_agent = getattr(args, "code_agent", False)
-            allow_shell = getattr(args, "allow_shell", False)
             output = run_react(
                 agents[0],
-                **common,
+                prompt,
+                config,
                 enabled_tools=args.tools if args.tools else (CODE_AGENT_TOOLS if code_agent else None),
                 max_steps=args.max_steps,
                 system_prompt=CODE_AGENT_SYSTEM_PROMPT if code_agent else None,
-                allow_shell=allow_shell,
+                allow_shell=getattr(args, "allow_shell", False),
             )
 
         else:
@@ -134,7 +133,7 @@ def cmd_run(args) -> None:
         output["correlation_id"] = correlation_id
         print(json.dumps(output, indent=2))
 
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         print(json.dumps({"error": str(exc), "correlation_id": correlation_id}, indent=2))
         sys.exit(1)
 
@@ -175,29 +174,15 @@ def cmd_monitor(args) -> None:
         output["correlation_id"] = correlation_id
         print(json.dumps(output, indent=2))
 
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         print(json.dumps({"error": str(exc), "correlation_id": correlation_id}, indent=2))
         sys.exit(1)
 
 
-def main() -> None:
-    """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        prog="ghostgrid",
-        description=(
-            "ghostgrid — multi-provider LLM and VLM inference with "
-            "sequential, parallel, conditional, iterative, MoA, ReAct, and monitoring workflows"
-        ),
-    )
-
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-
-    # ========================================================================
-    # Subcommand: run (default workflow execution)
-    # ========================================================================
+def _build_run_parser(subparsers) -> None:
+    """Register the 'run' subcommand."""
     run_parser = subparsers.add_parser("run", help="Run an LLM or VLM workflow")
 
-    # Image / prompt
     run_parser.add_argument("--prompt", "-p", type=str, default="What's in this input?")
     run_parser.add_argument(
         "--images",
@@ -211,8 +196,6 @@ def main() -> None:
     run_parser.add_argument("--tokens", "-t", type=int, default=300, help="Max tokens per response")
     run_parser.add_argument("--resize", "-r", action="store_true", help="Resize images with padding")
     run_parser.add_argument("--size", "-s", type=int, nargs=2, default=[512, 512], metavar=("W", "H"))
-
-    # Workflow
     run_parser.add_argument(
         "--workflow",
         "-w",
@@ -221,8 +204,6 @@ def main() -> None:
         choices=["sequential", "parallel", "conditional", "iterative", "moa", "react"],
         help="Workflow type (default: sequential)",
     )
-
-    # Agent targets
     run_parser.add_argument("--models", type=str, nargs="+", metavar="MODEL", help="One model per agent")
     run_parser.add_argument(
         "--providers",
@@ -232,13 +213,9 @@ def main() -> None:
         help=f"Provider per agent. Known: {list(PROVIDER_ENV_MAP.keys())}",
     )
     run_parser.add_argument("--endpoints", type=str, nargs="+", metavar="URL", help="API endpoint per agent")
-
-    # Single-agent fallback (backward-compatible)
     run_parser.add_argument("--model", "-m", type=str, default="gpt-5.2")
     run_parser.add_argument("--url", "-u", type=str, default=DEFAULT_ENDPOINT)
     run_parser.add_argument("--provider", type=str, default="openai")
-
-    # Special-role agents
     run_parser.add_argument("--aggregator-model", type=str, default=None)
     run_parser.add_argument("--aggregator-provider", type=str, default=None)
     run_parser.add_argument("--aggregator-endpoint", type=str, default=None)
@@ -250,8 +227,6 @@ def main() -> None:
     run_parser.add_argument("--evaluator-provider", type=str, default=None)
     run_parser.add_argument("--evaluator-endpoint", type=str, default=None)
     run_parser.add_argument("--max-iterations", type=int, default=3)
-
-    # ReAct args
     run_parser.add_argument(
         "--tools",
         type=str,
@@ -274,44 +249,51 @@ def main() -> None:
         action="store_true",
         help="Allow run_bash tool to execute shell commands (opt-in for safety).",
     )
-
     run_parser.set_defaults(func=cmd_run)
 
-    # ========================================================================
-    # Subcommand: monitor (video monitoring)
-    # ========================================================================
+
+def _build_monitor_parser(subparsers) -> None:
+    """Register the 'monitor' subcommand."""
     monitor_parser = subparsers.add_parser("monitor", help="Video monitoring with a VLM")
 
     monitor_parser.add_argument(
-        "--video", "-v", required=True, help="Video file path, RTSP URL, or device index (0 for webcam)"
+        "--video",
+        "-v",
+        required=True,
+        help="Video file path, RTSP URL, or device index (0 for webcam)",
     )
     monitor_parser.add_argument("--fps", type=float, default=1.0, help="Frame extraction rate (default: 1.0)")
     monitor_parser.add_argument("--max-frames", type=int, default=16, help="Max frames to extract (default: 16)")
     monitor_parser.add_argument("--detail", type=str, default="low", choices=["auto", "low", "high"])
     monitor_parser.add_argument("--max-tokens", type=int, default=1024)
-
     monitor_parser.add_argument("--provider", "-p", type=str, default="google")
     monitor_parser.add_argument("--model", "-m", type=str, default="gemini-2.5-flash")
     monitor_parser.add_argument("--endpoint", "-e", type=str, default=None)
-
     monitor_parser.add_argument("--alert-prompt", "-a", required=True, help="Condition to monitor for")
     monitor_parser.add_argument("--continuous", action="store_true", help="Run in continuous mode")
     monitor_parser.add_argument("--interval", type=float, default=10.0, help="Seconds between cycles (default: 10)")
     monitor_parser.add_argument("--window-frames", type=int, default=8, help="Frames per window (default: 8)")
     monitor_parser.add_argument("--output-jsonl", type=str, default=None, help="Output JSONL file path")
-
     monitor_parser.set_defaults(func=cmd_monitor)
 
-    # ========================================================================
-    # Parse and dispatch
-    # ========================================================================
+
+def main() -> None:
+    """Main CLI entry point."""
+    parser = argparse.ArgumentParser(
+        prog="ghostgrid",
+        description=(
+            "ghostgrid — multi-provider LLM and VLM inference with "
+            "sequential, parallel, conditional, iterative, MoA, ReAct, and monitoring workflows"
+        ),
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    _build_run_parser(subparsers)
+    _build_monitor_parser(subparsers)
+
     args = parser.parse_args()
 
-    # Handle legacy mode (no subcommand) for backward compatibility
     if args.command is None:
-        # Check if any run-specific args were provided
         if "--images" in sys.argv or "-i" in sys.argv or "--prompt" in sys.argv or "-p" in sys.argv:
-            # Legacy mode: parse as run command
             sys.argv.insert(1, "run")
             args = parser.parse_args()
         else:

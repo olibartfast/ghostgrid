@@ -4,7 +4,6 @@ Video monitoring workflow with ReAct-style structured output.
 Video source ──► Frame extraction ──► VLM analysis ──► Alert dispatch
 """
 
-import contextlib
 import json
 import logging
 import time
@@ -20,12 +19,12 @@ from ghostgrid.providers import (
     send_request,
 )
 from ghostgrid.tools.parsing import parse_monitor_output
-from ghostgrid.video import extract_frames_cv2, frames_to_base64
+from ghostgrid.video import extract_frames_cv2, frames_to_base64, open_video_capture
 
 log = logging.getLogger("ghostgrid.monitoring")
 
 
-def run_monitoring_cycle(
+def run_monitoring_cycle(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     endpoint: str,
     api_key: str,
     model: str,
@@ -98,11 +97,11 @@ def alert_handler_console(event: AlertEvent) -> None:
 
 def alert_handler_jsonl(event: AlertEvent, path: str = "alerts.jsonl") -> None:
     """Append alert event as a JSON line to a file."""
-    with open(path, "a") as f:
+    with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(event.__dict__) + "\n")
 
 
-def run_continuous_monitoring(
+def run_continuous_monitoring(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-branches
     source,
     endpoint: str,
     api_key: str,
@@ -123,16 +122,11 @@ def run_continuous_monitoring(
     sends them to the VLM, and processes the alert.
     """
     try:
-        import cv2
+        import cv2  # pylint: disable=import-outside-toplevel
     except ImportError as err:
         raise ImportError("opencv-python is required for continuous monitoring") from err
 
-    with contextlib.suppress(ValueError, TypeError):
-        source = int(source)
-
-    cap = cv2.VideoCapture(source)
-    if not cap.isOpened():
-        raise RuntimeError(f"Cannot open video source: {source}")
+    cap, source = open_video_capture(source)
 
     log.info(
         "Starting continuous monitoring: source=%s, model=%s, interval=%.0fs, window=%d frames @ %.1f fps",
@@ -188,7 +182,7 @@ def run_continuous_monitoring(
                 alert_handler_console(event)
                 if output_jsonl:
                     alert_handler_jsonl(event, output_jsonl)
-            except Exception as exc:
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 log.error("Monitoring cycle failed: %s", exc)
 
             time.sleep(interval_seconds)
@@ -199,7 +193,7 @@ def run_continuous_monitoring(
         cap.release()
 
 
-def run_monitoring(
+def run_monitoring(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
     video_source: str,
     endpoint: str,
     api_key: str,

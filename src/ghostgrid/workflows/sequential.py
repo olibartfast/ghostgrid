@@ -8,19 +8,11 @@ Input ──► [Agent-1] ──► output-1
                    prompt + output-1 + output-2 ──► [Agent-3] ──► final
 """
 
-from ghostgrid.models import Agent
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.providers import run_agent
 
 
-def run_sequential(
-    agents: list[Agent],
-    prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-) -> dict:
+def run_sequential(agents: list[Agent], prompt: str, config: InferenceConfig) -> dict:
     """
     Execute agents sequentially with accumulated context.
 
@@ -42,7 +34,7 @@ def run_sequential(
         else:
             current_prompt = prompt
 
-        result = run_agent(agent, current_prompt, image_paths, detail, max_tokens, resize, target_size)
+        result = run_agent(agent, current_prompt, config)
         if result.error:
             raise RuntimeError(f"Stage {i + 1} failed: {result.error}")
 

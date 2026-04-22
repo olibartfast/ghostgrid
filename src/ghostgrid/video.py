@@ -8,13 +8,21 @@ import logging
 
 log = logging.getLogger("ghostgrid.video")
 
-# cv2 is an optional dependency
-try:
-    import cv2
 
-    HAS_CV2 = True
-except ImportError:
-    HAS_CV2 = False
+def open_video_capture(source):
+    """Open a cv2.VideoCapture for source, normalising string device indices, and guard it opened."""
+    try:
+        import cv2  # pylint: disable=import-outside-toplevel
+    except ImportError as err:
+        raise ImportError("opencv-python is required: pip install opencv-python") from err
+
+    with contextlib.suppress(ValueError, TypeError):
+        source = int(source)
+
+    cap = cv2.VideoCapture(source)
+    if not cap.isOpened():
+        raise RuntimeError(f"Cannot open video source: {source}")
+    return cap, source
 
 
 def extract_frames_cv2(
@@ -33,16 +41,12 @@ def extract_frames_cv2(
     Returns:
         List of JPEG-encoded frame bytes
     """
-    if not HAS_CV2:
-        raise ImportError("opencv-python is required: pip install opencv-python")
+    try:
+        import cv2  # pylint: disable=import-outside-toplevel
+    except ImportError as err:
+        raise ImportError("opencv-python is required: pip install opencv-python") from err
 
-    # Interpret numeric string as device index
-    with contextlib.suppress(ValueError, TypeError):
-        source = int(source)
-
-    cap = cv2.VideoCapture(source)
-    if not cap.isOpened():
-        raise RuntimeError(f"Cannot open video source: {source}")
+    cap, _ = open_video_capture(source)
 
     video_fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
     frame_interval = max(1, int(video_fps / fps))

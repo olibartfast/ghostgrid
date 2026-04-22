@@ -68,6 +68,7 @@ Rules:
 # Code-agent system prompt template (filesystem + shell tools)
 # ---------------------------------------------------------------------------
 
+# pylint: disable-next=line-too-long
 CODE_AGENT_SYSTEM_PROMPT = """You are a coding agent with access to the local filesystem. Solve the task step by step using the available tools.
 
 Available tools:

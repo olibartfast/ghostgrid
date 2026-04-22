@@ -10,18 +10,16 @@ prompt ──► [Agent] ──► output-1
                        final output
 """
 
-from ghostgrid.models import Agent
+from dataclasses import replace
+
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.providers import run_agent
 
 
 def run_iterative(
     agent: Agent,
     prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
+    config: InferenceConfig,
     evaluator_agent: Agent | None = None,
     max_iterations: int = 3,
 ) -> dict:
@@ -37,7 +35,7 @@ def run_iterative(
     current_prompt = prompt
 
     for i in range(max_iterations):
-        result = run_agent(agent, current_prompt, image_paths, detail, max_tokens, resize, target_size)
+        result = run_agent(agent, current_prompt, config)
         if result.error:
             raise RuntimeError(f"Iteration {i + 1} failed: {result.error}")
 
@@ -49,7 +47,7 @@ def run_iterative(
                 f"Response: {result.content}\n\n"
                 "Reply with ONLY a single integer between 1 and 10."
             )
-            eval_result = run_agent(evaluator_agent, eval_prompt, [], detail, max_tokens, resize, target_size)
+            eval_result = run_agent(evaluator_agent, eval_prompt, replace(config, image_paths=[]))
             if eval_result.error:
                 raise RuntimeError(f"Evaluator failed during iteration {i + 1}: {eval_result.error}")
             try:

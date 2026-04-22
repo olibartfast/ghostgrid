@@ -5,114 +5,54 @@ Built-in ReAct tools for vision analysis and code/filesystem operations.
 import os
 import subprocess
 
-from ghostgrid.models import Agent, Tool
+from ghostgrid.models import Agent, InferenceConfig, Tool
 from ghostgrid.providers import run_agent
 
 _SHELL_BLOCKED = "Shell execution is disabled. Re-run with --allow-shell to enable run_bash."
 
 
-def _tool_describe(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_describe(agent: Agent, config: InferenceConfig, **kwargs) -> str:
     """Ask the VLM to describe the image(s)."""
     prompt = kwargs.get("prompt", "Describe this image in detail.")
-    result = run_agent(agent, prompt, image_paths, detail, max_tokens, resize, target_size)
+    result = run_agent(agent, prompt, config)
     return result.content if result.success else f"ERROR: {result.error}"
 
 
-def _tool_detect_objects(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_detect_objects(agent: Agent, config: InferenceConfig, **_kwargs) -> str:
     """Ask the VLM to list all objects visible in the image(s)."""
     result = run_agent(
         agent,
         "List every distinct object you can see in this image. Return as a JSON array of strings.",
-        image_paths,
-        detail,
-        max_tokens,
-        resize,
-        target_size,
+        config,
     )
     return result.content if result.success else f"ERROR: {result.error}"
 
 
-def _tool_read_text(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_read_text(agent: Agent, config: InferenceConfig, **_kwargs) -> str:
     """Ask the VLM to extract all visible text (OCR) from the image(s)."""
     result = run_agent(
         agent,
         "Extract and return all text visible in this image, preserving the reading order.",
-        image_paths,
-        detail,
-        max_tokens,
-        resize,
-        target_size,
+        config,
     )
     return result.content if result.success else f"ERROR: {result.error}"
 
 
-def _tool_analyze_region(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_analyze_region(agent: Agent, config: InferenceConfig, **kwargs) -> str:
     """Ask the VLM to focus analysis on a described region of the image."""
     region = kwargs.get("region", "the center of the image")
     question = kwargs.get("question", "What do you see?")
-    result = run_agent(
-        agent,
-        f"Focus only on {region}. {question}",
-        image_paths,
-        detail,
-        max_tokens,
-        resize,
-        target_size,
-    )
+    result = run_agent(agent, f"Focus only on {region}. {question}", config)
     return result.content if result.success else f"ERROR: {result.error}"
 
 
-def _tool_count_objects(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_count_objects(agent: Agent, config: InferenceConfig, **kwargs) -> str:
     """Ask the VLM to count occurrences of a specific object."""
     object_name = kwargs.get("object", "objects")
     result = run_agent(
         agent,
         f"Count exactly how many '{object_name}' are visible in this image. Return only an integer.",
-        image_paths,
-        detail,
-        max_tokens,
-        resize,
-        target_size,
+        config,
     )
     return result.content if result.success else f"ERROR: {result.error}"
 
@@ -122,35 +62,19 @@ def _tool_count_objects(
 # ---------------------------------------------------------------------------
 
 
-def _tool_read_file(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_read_file(_agent: Agent, _config: InferenceConfig, **kwargs) -> str:
     """Read a file from the local filesystem and return its contents."""
     path = kwargs.get("path")
     if not path:
         return "ERROR: 'path' parameter is required."
     try:
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             return f.read()
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return f"ERROR: {exc}"
 
 
-def _tool_write_file(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_write_file(_agent: Agent, _config: InferenceConfig, **kwargs) -> str:
     """Write content to a file, creating parent directories as needed."""
     path = kwargs.get("path")
     content = kwargs.get("content", "")
@@ -160,22 +84,14 @@ def _tool_write_file(
         parent = os.path.dirname(os.path.abspath(path))
         if parent:
             os.makedirs(parent, exist_ok=True)
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(content)
         return f"Written {len(content)} bytes to {path}"
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return f"ERROR: {exc}"
 
 
-def _tool_list_directory(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_list_directory(_agent: Agent, _config: InferenceConfig, **kwargs) -> str:
     """List the contents of a directory."""
     path = kwargs.get("path", ".")
     try:
@@ -185,19 +101,11 @@ def _tool_list_directory(
             tag = "/" if os.path.isdir(os.path.join(path, entry)) else ""
             lines.append(f"{entry}{tag}")
         return "\n".join(lines) if lines else "(empty directory)"
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return f"ERROR: {exc}"
 
 
-def _tool_run_bash(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_run_bash(_agent: Agent, _config: InferenceConfig, **kwargs) -> str:
     """Execute a shell command and return stdout + stderr. Requires --allow-shell."""
     if not kwargs.get("allow_shell", False):
         return _SHELL_BLOCKED
@@ -211,6 +119,7 @@ def _tool_run_bash(
             capture_output=True,
             text=True,
             timeout=30,
+            check=False,
         )
         output = proc.stdout
         if proc.stderr:
@@ -218,19 +127,11 @@ def _tool_run_bash(
         return output.strip() or "(no output)"
     except subprocess.TimeoutExpired:
         return "ERROR: Command timed out after 30 seconds."
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return f"ERROR: {exc}"
 
 
-def _tool_search_files(
-    agent: Agent,
-    image_paths: list[str],
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-    **kwargs,
-) -> str:
+def _tool_search_files(_agent: Agent, _config: InferenceConfig, **kwargs) -> str:
     """Search for a text pattern across files in a directory (grep -rn)."""
     pattern = kwargs.get("pattern")
     path = kwargs.get("path", ".")
@@ -242,6 +143,7 @@ def _tool_search_files(
             capture_output=True,
             text=True,
             timeout=15,
+            check=False,
         )
         output = proc.stdout.strip()
         if not output:
@@ -253,7 +155,7 @@ def _tool_search_files(
         return output
     except subprocess.TimeoutExpired:
         return "ERROR: Search timed out."
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return f"ERROR: {exc}"
 
 
@@ -279,7 +181,10 @@ BUILTIN_TOOLS: dict[str, Tool] = {
     "analyze_region": Tool(
         name="analyze_region",
         description="Focus analysis on a specific region of the image.",
-        parameters='{"region": "description of the region, e.g. top-left corner", "question": "what to answer about that region"}',
+        parameters=(
+            '{"region": "description of the region, e.g. top-left corner",'
+            ' "question": "what to answer about that region"}'
+        ),
         fn=_tool_analyze_region,
     ),
     "count_objects": Tool(

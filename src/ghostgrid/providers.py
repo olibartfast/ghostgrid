@@ -6,43 +6,37 @@ import time
 import requests
 
 from ghostgrid.image import encode_image, is_url
-from ghostgrid.models import Agent, AgentResult
+from ghostgrid.models import Agent, AgentResult, InferenceConfig
 
 
 def create_payload(
     prompt: str,
-    image_paths: list[str] | None,
     model: str,
-    detail: str,
-    max_tokens: int,
-    resize: bool = False,
-    target_size: tuple[int, int] = (512, 512),
+    config: InferenceConfig,
 ) -> dict:
-    """
-    Build an OpenAI-compatible chat-completions payload.
-    """
+    """Build an OpenAI-compatible chat-completions payload."""
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-        "max_tokens": max_tokens,
+        "max_tokens": config.max_tokens,
     }
-    for image_path in image_paths or []:
-        if is_url(image_path) and not resize:
+    for image_path in config.image_paths or []:
+        if is_url(image_path) and not config.resize:
             img_block = {
                 "type": "image_url",
-                "image_url": {"url": image_path, "detail": detail},
+                "image_url": {"url": image_path, "detail": config.detail},
             }
         else:
-            b64 = encode_image(image_path, resize, target_size)
+            b64 = encode_image(image_path, config.resize, config.target_size)
             img_block = {
                 "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": detail},
+                "image_url": {"url": f"data:image/jpeg;base64,{b64}", "detail": config.detail},
             }
         payload["messages"][0]["content"].append(img_block)
     return payload
 
 
-def build_video_payload(
+def build_video_payload(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     model: str,
     system_prompt: str,
     user_prompt: str,
@@ -82,27 +76,19 @@ def build_video_payload(
 
 def create_anthropic_payload(
     prompt: str,
-    image_paths: list[str] | None,
     model: str,
-    max_tokens: int,
-    resize: bool = False,
-    target_size: tuple[int, int] = (512, 512),
+    config: InferenceConfig,
 ) -> dict:
-    """
-    Build an Anthropic Messages API payload with images.
-
-    Uses Anthropic's native image format (base64 or URL source blocks)
-    instead of OpenAI's image_url wrapper.
-    """
+    """Build an Anthropic Messages API payload with images."""
     content: list[dict] = [{"type": "text", "text": prompt}]
-    for image_path in image_paths or []:
-        if is_url(image_path) and not resize:
+    for image_path in config.image_paths or []:
+        if is_url(image_path) and not config.resize:
             img_block = {
                 "type": "image",
                 "source": {"type": "url", "url": image_path},
             }
         else:
-            b64 = encode_image(image_path, resize, target_size)
+            b64 = encode_image(image_path, config.resize, config.target_size)
             img_block = {
                 "type": "image",
                 "source": {
@@ -114,7 +100,7 @@ def create_anthropic_payload(
         content.append(img_block)
     return {
         "model": model,
-        "max_tokens": max_tokens,
+        "max_tokens": config.max_tokens,
         "messages": [{"role": "user", "content": content}],
     }
 
@@ -187,15 +173,8 @@ def send_anthropic_request(
     return response.json()
 
 
-def normalize_response(response: dict, provider: str = "openai") -> str:
-    """
-    Extract text content from any supported provider response shape.
-
-    Supports:
-    - OpenAI-compatible: choices[0].message.content
-    - Anthropic: content[0].text
-    - Google: candidates[0].content.parts[0].text
-    """
+def normalize_response(response: dict) -> str:
+    """Extract text content from any supported provider response shape."""
     try:
         return response["choices"][0]["message"]["content"]  # OpenAI-compatible
     except (KeyError, IndexError):
@@ -211,20 +190,12 @@ def normalize_response(response: dict, provider: str = "openai") -> str:
     return json.dumps(response)
 
 
-def run_agent(
-    agent: Agent,
-    prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-) -> AgentResult:
+def run_agent(agent: Agent, prompt: str, config: InferenceConfig) -> AgentResult:
     """Execute a single agent call and return an AgentResult."""
     if agent.provider == "anthropic":
-        payload = create_anthropic_payload(prompt, image_paths, agent.model, max_tokens, resize, target_size)
+        payload = create_anthropic_payload(prompt, agent.model, config)
     else:
-        payload = create_payload(prompt, image_paths, agent.model, detail, max_tokens, resize, target_size)
+        payload = create_payload(prompt, agent.model, config)
     t0 = time.time()
     try:
         if agent.provider == "anthropic":
@@ -236,11 +207,11 @@ def run_agent(
             agent_id=agent.agent_id,
             model=agent.model,
             provider=agent.provider,
-            content=normalize_response(response, agent.provider),
+            content=normalize_response(response),
             raw_response=response,
             latency_ms=latency_ms,
         )
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         return AgentResult(
             agent_id=agent.agent_id,
             model=agent.model,
