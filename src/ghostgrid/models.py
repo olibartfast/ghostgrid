@@ -36,13 +36,24 @@ class AgentResult:
 
 
 @dataclass
+class InferenceConfig:
+    """Shared inference parameters passed through the call stack."""
+
+    image_paths: list[str] | None
+    detail: str
+    max_tokens: int
+    resize: bool
+    target_size: tuple[int, int]
+
+
+@dataclass
 class Tool:
     """Definition of a ReAct tool."""
 
     name: str
     description: str
     parameters: str  # JSON schema hint shown to the agent
-    fn: Callable  # fn(agent, image_paths, detail, max_tokens, resize, target_size, **kwargs) -> str
+    fn: Callable  # fn(agent, config: InferenceConfig, **kwargs) -> str
 
 
 @dataclass

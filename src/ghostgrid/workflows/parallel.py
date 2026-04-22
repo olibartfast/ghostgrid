@@ -8,19 +8,12 @@ Input ──► [Agent-3] ─┘
 
 import concurrent.futures
 
-from ghostgrid.models import Agent
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.providers import run_agent
+from ghostgrid.workflows._utils import _result_to_dict
 
 
-def run_parallel(
-    agents: list[Agent],
-    prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
-) -> dict:
+def run_parallel(agents: list[Agent], prompt: str, config: InferenceConfig) -> dict:
     """
     Execute all agents concurrently and select the best response.
 
@@ -31,10 +24,7 @@ def run_parallel(
         raise ValueError("parallel workflow requires at least 2 agents")
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {
-            executor.submit(run_agent, a, prompt, image_paths, detail, max_tokens, resize, target_size): a
-            for a in agents
-        }
+        futures = {executor.submit(run_agent, a, prompt, config): a for a in agents}
         results = [f.result() for f in concurrent.futures.as_completed(futures)]
 
     successful = [r for r in results if r.success]
@@ -49,15 +39,5 @@ def run_parallel(
         "selected_model": best.model,
         "selected_provider": best.provider,
         "content": best.content,
-        "agents": [
-            {
-                "agent_id": r.agent_id,
-                "model": r.model,
-                "provider": r.provider,
-                "latency_ms": round(r.latency_ms, 1),
-                "success": r.success,
-                "error": r.error,
-            }
-            for r in results
-        ],
+        "agents": [_result_to_dict(r) for r in results],
     }

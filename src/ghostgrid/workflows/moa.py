@@ -8,19 +8,16 @@ Input ──► [Proposer-3] ─┘
 
 import concurrent.futures
 
-from ghostgrid.models import Agent
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.providers import run_agent
+from ghostgrid.workflows._utils import _result_to_dict
 
 
 def run_moa(
     proposer_agents: list[Agent],
     aggregator_agent: Agent,
     prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
+    config: InferenceConfig,
 ) -> dict:
     """
     Execute multiple proposers in parallel, then aggregate results.
@@ -33,10 +30,7 @@ def run_moa(
 
     # Step 1 — Parallel proposers
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [
-            executor.submit(run_agent, a, prompt, image_paths, detail, max_tokens, resize, target_size)
-            for a in proposer_agents
-        ]
+        futures = [executor.submit(run_agent, a, prompt, config) for a in proposer_agents]
         proposer_results = [f.result() for f in concurrent.futures.as_completed(futures)]
 
     successful = [r for r in proposer_results if r.success]
@@ -54,15 +48,7 @@ def run_moa(
         "Compare the candidates, extract consensus points, resolve conflicts, "
         "and produce one final, comprehensive best answer."
     )
-    agg_result = run_agent(
-        aggregator_agent,
-        aggregator_prompt,
-        image_paths,
-        detail,
-        max_tokens,
-        resize,
-        target_size,
-    )
+    agg_result = run_agent(aggregator_agent, aggregator_prompt, config)
     if agg_result.error:
         raise RuntimeError(f"Aggregator agent failed: {agg_result.error}")
 
@@ -72,16 +58,6 @@ def run_moa(
         "aggregator_provider": aggregator_agent.provider,
         "aggregator_latency_ms": round(agg_result.latency_ms, 1),
         "content": agg_result.content,
-        "proposers": [
-            {
-                "agent_id": r.agent_id,
-                "model": r.model,
-                "provider": r.provider,
-                "latency_ms": round(r.latency_ms, 1),
-                "success": r.success,
-                "error": r.error,
-            }
-            for r in proposer_results
-        ],
+        "proposers": [_result_to_dict(r) for r in proposer_results],
         "raw_aggregator_response": agg_result.raw_response,
     }

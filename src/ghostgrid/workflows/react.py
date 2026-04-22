@@ -9,19 +9,15 @@ prompt ──► [Agent: Thought + Action] ──► tool call
 """
 
 from ghostgrid.config import REACT_SYSTEM_PROMPT
-from ghostgrid.models import Agent, Tool
+from ghostgrid.models import Agent, InferenceConfig, Tool
 from ghostgrid.providers import run_agent
 from ghostgrid.tools import BUILTIN_TOOLS, _parse_react_step
 
 
-def run_react(
+def run_react(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
     agent: Agent,
     prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
+    config: InferenceConfig,
     enabled_tools: list[str] | None = None,
     max_steps: int = 5,
     system_prompt: str | None = None,
@@ -50,7 +46,7 @@ def run_react(
     final_answer = None
 
     for step_num in range(1, max_steps + 1):
-        result = run_agent(agent, conversation, image_paths, detail, max_tokens, resize, target_size)
+        result = run_agent(agent, conversation, config)
         if result.error:
             raise RuntimeError(f"ReAct step {step_num} agent call failed: {result.error}")
 
@@ -66,10 +62,8 @@ def run_react(
             observation = f"Unknown tool '{action}'. Available tools: {list(tools.keys())}. Please choose a valid tool."
         else:
             try:
-                observation = tools[action].fn(
-                    agent, image_paths, detail, max_tokens, resize, target_size, allow_shell=allow_shell, **action_input
-                )
-            except Exception as exc:
+                observation = tools[action].fn(agent, config, allow_shell=allow_shell, **action_input)
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 observation = f"Tool '{action}' raised an error: {exc}"
 
         steps.append(

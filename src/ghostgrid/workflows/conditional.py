@@ -10,7 +10,7 @@ Input ──► [Router Agent] ──► category
                              final output
 """
 
-from ghostgrid.models import Agent
+from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.providers import run_agent
 
 
@@ -19,11 +19,7 @@ def run_conditional(
     specialist_agents: list[Agent],
     categories: list[str],
     prompt: str,
-    image_paths: list[str] | None,
-    detail: str,
-    max_tokens: int,
-    resize: bool,
-    target_size: tuple[int, int],
+    config: InferenceConfig,
 ) -> dict:
     """
     Route input to a specialist based on router classification.
@@ -43,7 +39,7 @@ def run_conditional(
         "Reply with ONLY the category name, nothing else.\n\n"
         f"Prompt: {prompt}"
     )
-    router_result = run_agent(router_agent, router_prompt, image_paths, detail, max_tokens, resize, target_size)
+    router_result = run_agent(router_agent, router_prompt, config)
     if router_result.error:
         raise RuntimeError(f"Router agent failed: {router_result.error}")
 
@@ -63,7 +59,7 @@ def run_conditional(
         specialist = specialist_agents[0]
 
     # Step 3 — Specialist handles the actual request
-    spec_result = run_agent(specialist, prompt, image_paths, detail, max_tokens, resize, target_size)
+    spec_result = run_agent(specialist, prompt, config)
     if spec_result.error:
         raise RuntimeError(f"Specialist agent failed: {spec_result.error}")
 
