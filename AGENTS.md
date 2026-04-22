@@ -136,3 +136,6 @@ pytest tests/ -q -x
 
 If this is green locally, CI will be green. The `pre_push_ci_gate.sh` hook
 runs exactly these commands.
+
+**Rule: always run the full gate command before every commit and push.**
+A push that skips local tests risks breaking CI for everyone. No exceptions.
