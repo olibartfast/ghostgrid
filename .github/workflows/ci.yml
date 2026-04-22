@@ -2,82 +2,140 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [master, main]
   pull_request:
-    branches: [ main, master ]
+    branches: [master, main]
+  workflow_dispatch:
+
+# Cancel redundant runs on rapid re-pushes. Without this, CI #17-20 style
+# flurries burn minutes racing each other.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONUNBUFFERED: "1"
+  # Ruff and pylint both respect FORCE_COLOR for readable logs.
+  FORCE_COLOR: "1"
 
 jobs:
+  # ------------------------------------------------------------------
+  # Lint: ruff + pylint. Runs first because it's the fastest and catches
+  # the I001/F401/F841/C408/R0801/cv2 failures that dominate CI history.
+  # ------------------------------------------------------------------
   lint:
+    name: Lint (ruff + pylint)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-        cache: 'pip'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: |
+            pyproject.toml
+            requirements.txt
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev,video]"
+      - name: Install project (dev + video extras)
+        # Mirrors .claude/hooks/pre_push_ci_gate.sh so local == CI.
+        # Video extra is mandatory here — pylint must be able to import cv2
+        # when checking src/ghostgrid/video.py, otherwise E0401 fires.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,video]"
 
-    - name: Lint with ruff
-      run: |
-        ruff check src/ tests/
-        ruff format src/ tests/ --check
+      - name: Ruff check
+        # --output-format=github turns violations into inline PR annotations.
+        # This is the single biggest quality-of-life CI improvement for this repo.
+        run: ruff check --output-format=github src/ tests/
 
-    - name: Lint with pylint
-      run: |
-        pylint src/ghostgrid/ --fail-under=8.0
+      - name: Ruff format
+        run: ruff format --check src/ tests/
 
+      - name: Pylint
+        # --fail-under=8.0 is the architectural floor per AGENTS.md.
+        # Keep this threshold; do not lower it to make CI pass.
+        run: pylint src/ghostgrid/ --fail-under=8.0
+
+  # ------------------------------------------------------------------
+  # Test: pytest across the supported Python matrix. Needs lint so we
+  # don't burn 3x minutes running tests on code that's going to fail
+  # lint anyway.
+  # ------------------------------------------------------------------
   test:
-    runs-on: ubuntu-latest
+    name: Test (py${{ matrix.python-version }})
     needs: lint
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: 'pip'
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: |
+            pyproject.toml
+            requirements.txt
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e ".[dev,video]"
+      - name: Install project (dev + video extras)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,video]"
 
-    - name: Type check with mypy
-      run: |
-        # mypy currently has some untyped imports/assignments which we allow to pass
-        # but we run it to catch any new regressions
-        mypy src/ || true
+      - name: Mypy (soft-fail per AGENTS.md)
+        run: mypy src/ || true
 
-    - name: Run tests with pytest
-      run: |
-        pytest tests/ --cov=ghostgrid --cov-report=xml
+      - name: Pytest
+        run: pytest tests/ -q --cov=ghostgrid --cov-report=xml --cov-report=term
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
+      - name: Upload coverage
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
 
+  # ------------------------------------------------------------------
+  # Build: hatch build. Only needs lint (not test) — a package that
+  # doesn't build is broken regardless of test outcome.
+  # ------------------------------------------------------------------
   build:
+    name: Build sdist + wheel
+    needs: lint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - name: Install build dependencies
-      run: pip install hatch
-    - name: Build package
-      run: hatch build
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install hatch
+        run: pip install hatch
+
+      - name: Hatch build
+        run: hatch build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
