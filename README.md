@@ -1,4 +1,6 @@
-# Multimodal Agent Gateway
+# ghostgrid
+
+> A grid for multimodal agents — route vision, text, and code across providers through one gateway.
 
 Multi-provider LLM and VLM inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring — including **code-agent mode** (filesystem + shell tools, similar to Claude Code / OpenAI Codex).
 
@@ -22,38 +24,38 @@ pip install -e ".[dev,video]"
 pip install -e ".[dev,video]"
 
 # Sequential workflow (default) - each stage builds on previous
-agent-gateway run --workflow sequential \
+ghostgrid run --workflow sequential \
     --prompt "Summarize the tradeoffs of MoE vs dense models"
 
 # Sequential multimodal workflow
-agent-gateway run --workflow sequential \
+ghostgrid run --workflow sequential \
     --prompt "Describe this image" \
     --images image.jpg \
     --models gpt-5.2 gpt-5.2 \
     --providers openai openai
 
 # Parallel workflow - same input to multiple agents
-agent-gateway run --workflow parallel \
+ghostgrid run --workflow parallel \
     --prompt "What objects are in this image?" \
     --images image.jpg \
     --models gpt-5.2 meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8 \
     --providers openai together
 
 # ReAct workflow - vision tools (images required)
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Count the people and describe what they're doing" \
     --images image.jpg \
     --model gpt-5.2 \
     --tools describe detect_objects count_objects
 
 # Code-agent mode - filesystem tools, no image needed
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Find all TODO comments in the src/ directory and summarise them" \
     --model gpt-5.2 \
     --code-agent
 
 # Code-agent with shell execution (opt-in)
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Run the test suite and report any failures" \
     --model gpt-5.2 \
     --code-agent --allow-shell
@@ -63,14 +65,14 @@ TOGETHER_API_KEY=... python3 examples/together_nemotron_reasoning.py \
     --prompt "Design an agent architecture for triaging IT support tickets"
 
 # Video monitoring - continuous or single-shot
-agent-gateway monitor \
+ghostgrid monitor \
     --video ./sample.mp4 \
     --alert-prompt "Is anyone falling or in distress?" \
     --provider google \
     --model gemini-2.5-flash
 
 # Continuous webcam monitoring
-agent-gateway monitor \
+ghostgrid monitor \
     --video 0 \
     --alert-prompt "Has anyone entered the restricted area?" \
     --continuous --interval 10
@@ -90,7 +92,7 @@ agent-gateway monitor \
 ## Workflow Modes
 
 | Mode | Agents | Data Flow |
-|------|--------|-----------|
+| --- | --- | --- |
 | `sequential` | ≥ 1 | Agent-1 → output-1 → Agent-2 (with context) → … → final |
 | `parallel` | ≥ 2 | All agents receive same input concurrently → best answer |
 | `conditional` | ≥ 2 | Router classifies input → matching specialist handles |
@@ -106,7 +108,7 @@ The `react` workflow exposes a registry of tools the agent can invoke at each st
 ### Vision tools (require `--images`)
 
 | Tool | Description |
-|------|-------------|
+| --- | --- |
 | `describe` | Generate a detailed description of the image(s) |
 | `detect_objects` | List all distinct objects visible in the image(s) |
 | `read_text` | Extract all visible text (OCR) from the image(s) |
@@ -116,7 +118,7 @@ The `react` workflow exposes a registry of tools the agent can invoke at each st
 ### Code-agent / filesystem tools
 
 | Tool | Description |
-|------|-------------|
+| --- | --- |
 | `read_file` | Read a file from the local filesystem |
 | `write_file` | Write or overwrite a file (creates parent directories) |
 | `list_directory` | List the contents of a directory |
@@ -129,26 +131,26 @@ The `react` workflow exposes a registry of tools the agent can invoke at each st
 
 ```bash
 # Explore a codebase and answer a question (safe, no shell)
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "What does the run_react function do? Read the relevant source files." \
     --model claude-3-5-sonnet-20241022 \
     --provider anthropic \
     --code-agent
 
 # Write a new feature (reads existing files, writes new ones)
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Add a hello_world() function to src/utils.py" \
     --model gpt-5.2 \
     --code-agent
 
 # Run tests and fix failures (shell enabled)
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Run pytest and fix any failing tests" \
     --model gpt-5.2 \
     --code-agent --allow-shell --max-steps 10
 
 # Combine vision + code: analyse a screenshot then write code based on it
-agent-gateway run --workflow react \
+ghostgrid run --workflow react \
     --prompt "Read the UI shown in the screenshot and generate matching HTML" \
     --images screenshot.png \
     --model gpt-5.2 \
@@ -163,19 +165,19 @@ The `monitor` command remains vision-specific and supports video-capable VLMs fo
 
 ```bash
 # Fall detection
-agent-gateway monitor \
+ghostgrid monitor \
     --video ./elderly_room.mp4 \
     --alert-prompt "Is anyone falling, lying on the floor, or in distress?" \
     --fps 1 --max-frames 30
 
 # Continuous security monitoring
-agent-gateway monitor \
+ghostgrid monitor \
     --video rtsp://camera.local:554/stream \
     --alert-prompt "Has anyone entered the restricted zone?" \
     --continuous --interval 10 --window-frames 8
 
 # Self-hosted with vLLM
-agent-gateway monitor \
+ghostgrid monitor \
     --video 0 \
     --endpoint http://localhost:8000/v1/chat/completions \
     --model Qwen/Qwen3-VL-8B-Instruct \
@@ -188,25 +190,26 @@ See [docs/video-vlm-agents.md](docs/video-vlm-agents.md) for model recommendatio
 ## Supported Providers
 
 | Provider | `--provider` | API Key Env Var | Notes |
-|----------|--------------|-----------------|-------|
-| OpenAI | `openai` | `OPENAI_API_KEY` | |
+| --- | --- | --- | --- |
+| OpenAI | `openai` | `OPENAI_API_KEY` |  |
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | Native Messages API |
 | Google | `google` | `GOOGLE_API_KEY` | OpenAI-compat endpoint |
-| Together AI | `together` | `TOGETHER_API_KEY` | |
+| Together AI | `together` | `TOGETHER_API_KEY` |  |
 | Azure OpenAI | `azure` | `AZURE_OPENAI_API_KEY` | Requires explicit `--url` |
-| Groq | `groq` | `GROQ_API_KEY` | |
-| Mistral | `mistral` | `MISTRAL_API_KEY` | |
-| Cerebras | `cerebras` | `CEREBRAS_API_KEY` | |
+| Groq | `groq` | `GROQ_API_KEY` |  |
+| Mistral | `mistral` | `MISTRAL_API_KEY` |  |
+| Cerebras | `cerebras` | `CEREBRAS_API_KEY` |  |
 
 Together-hosted text model example:
+
 - `nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8` for long-context reasoning and structured text generation
 
 ## Python API
 
 ```python
-from multimodal_agent_gateway import run_sequential, run_react, run_monitoring
-from multimodal_agent_gateway.cli import make_agent
-from multimodal_agent_gateway.config import CODE_AGENT_SYSTEM_PROMPT, CODE_AGENT_TOOLS
+from ghostgrid import run_sequential, run_react, run_monitoring
+from ghostgrid.cli import make_agent
+from ghostgrid.config import CODE_AGENT_SYSTEM_PROMPT, CODE_AGENT_TOOLS
 
 # Create a text-only Together AI agent
 agent = make_agent(
@@ -254,10 +257,10 @@ print(result["content"])
 
 ## Documentation
 
-- [Video VLM Agents Guide](docs/video-vlm-agents.md) - Video-capable VLMs, vLLM deployment, hardware sizing
-- [API Services](docs/api-services.md) - LLM and multimodal API providers
-- [Benchmarks](docs/benchmarks.md) - LLM, VLM, and video evaluation references
-- [Inference](docs/inference.md) - Inference frameworks and tools
+- [Video VLM Agents Guide](docs/video-vlm-agents.md) — Video-capable VLMs, vLLM deployment, hardware sizing
+- [API Services](docs/api-services.md) — LLM and multimodal API providers
+- [Benchmarks](docs/benchmarks.md) — LLM, VLM, and video evaluation references
+- [Inference](docs/inference.md) — Inference frameworks and tools
 
 ## License
 
