@@ -9,7 +9,6 @@ import requests
 from ghostgrid.image import encode_image, is_url
 from ghostgrid.models import Agent, AgentResult, InferenceConfig
 
-
 TEXT_ONLY_MULTIMODAL_GUARDS: dict[str, str] = {
     "glm-5.1": "GLM-5.1 is text-only on Z.AI. For image or video inputs, switch to GLM-4.6V.",
 }
