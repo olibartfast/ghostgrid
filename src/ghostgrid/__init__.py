@@ -8,6 +8,9 @@ and 7 workflow patterns (sequential, parallel, conditional, iterative, MoA, ReAc
 
 from pathlib import Path
 
+# Agent backends
+from ghostgrid.backends import BACKEND_CHOICES, open_backend_session
+
 # Core models
 # Configuration
 from ghostgrid.config import (
@@ -66,6 +69,9 @@ __version__ = _read_version()
 __all__ = [
     # Version
     "__version__",
+    # Backends
+    "BACKEND_CHOICES",
+    "open_backend_session",
     # Models
     "Agent",
     "AgentResult",

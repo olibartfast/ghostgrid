@@ -7,6 +7,7 @@ import os
 import sys
 import uuid
 
+from ghostgrid.backends import BACKEND_CHOICES, open_backend_session
 from ghostgrid.config import (
     CODE_AGENT_SYSTEM_PROMPT,
     CODE_AGENT_TOOLS,
@@ -74,6 +75,9 @@ def cmd_run(args) -> None:  # pylint: disable=too-many-locals
     correlation_id = str(uuid.uuid4())[:12]
 
     try:
+        if args.agent_backend:
+            sys.exit(open_backend_session(args.agent_backend, args.prompt))
+
         models = args.models if args.models else [args.model]
         providers = args.providers or [args.provider] * len(models)
         endpoints = args.endpoints or [args.url] * len(models)
@@ -248,6 +252,13 @@ def _build_run_parser(subparsers) -> None:
         "--allow-shell",
         action="store_true",
         help="Allow run_bash tool to execute shell commands (opt-in for safety).",
+    )
+    run_parser.add_argument(
+        "--agent-backend",
+        type=str,
+        default=None,
+        choices=BACKEND_CHOICES,
+        help="Delegate to an external coding-agent CLI instead of an LLM API. Choices: %(choices)s",
     )
     run_parser.set_defaults(func=cmd_run)
 

@@ -4,7 +4,7 @@
 
 > A grid for multimodal agents — route vision, text, and code across providers through one gateway.
 
-Multi-provider LLM and VLM inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring — including **code-agent mode** (filesystem + shell tools, similar to Claude Code / OpenAI Codex).
+Multi-provider LLM and VLM inference framework with 7 workflow patterns: sequential, parallel, conditional, iterative, Mixture-of-Agents (MoA), ReAct (Reasoning + Acting), and video monitoring — including **code-agent mode** (filesystem + shell tools) and **external agent backend switching** (hand off to Claude Code, Codex, opencode, or pi for a full interactive session).
 
 ## Installation
 
@@ -78,6 +78,12 @@ ghostgrid monitor \
     --video 0 \
     --alert-prompt "Has anyone entered the restricted area?" \
     --continuous --interval 10
+
+# Delegate to an external coding-agent CLI (opens interactive session)
+ghostgrid run --agent-backend claude-code --prompt "refactor the auth module"
+ghostgrid run --agent-backend codex --prompt "add type hints throughout src/"
+ghostgrid run --agent-backend opencode --prompt "fix the failing tests"
+ghostgrid run --agent-backend pi
 ```
 
 ## Features
@@ -88,6 +94,7 @@ ghostgrid monitor \
 - **Video monitoring** — Fall detection, security monitoring, safety compliance
 - **Vision ReAct tools** — `describe`, `detect_objects`, `read_text`, `analyze_region`, `count_objects`
 - **Code-agent mode** — `read_file`, `write_file`, `list_directory`, `search_files`, `run_bash` (opt-in)
+- **External agent backends** — delegate to `claude-code`, `codex`, `opencode`, or `pi` for a full interactive session
 - **`--images` optional** — code-agent tasks work without any image input
 - **Observability** — per-agent latency, correlation IDs, structured JSON output
 
@@ -160,6 +167,33 @@ ghostgrid run --workflow react \
 ```
 
 > **Safety note:** `run_bash` is blocked by default. Pass `--allow-shell` explicitly to enable it. All file writes are permanent — review the agent's plan before using `--allow-shell` in sensitive directories.
+
+## External Agent Backends
+
+`--agent-backend` hands off the task to an external coding-agent CLI instead of making a direct LLM API call. ghostgrid launches the agent with an optional initial prompt, inherits the full terminal (TUI/REPL works as normal), and exits with the agent's exit code.
+
+```bash
+# Open a Claude Code session with an initial task
+ghostgrid run --agent-backend claude-code --prompt "refactor the auth module"
+
+# Open a Codex session
+ghostgrid run --agent-backend codex --prompt "add type hints throughout src/"
+
+# Open an opencode session
+ghostgrid run --agent-backend opencode --prompt "fix the failing tests"
+
+# Open a pi session with no initial prompt — type your task in the TUI
+ghostgrid run --agent-backend pi
+```
+
+| Backend | CLI invoked | Project |
+| --- | --- | --- |
+| `claude-code` | `claude` | [Anthropic Claude Code](https://claude.ai/code) |
+| `codex` | `codex` | [OpenAI Codex CLI](https://developers.openai.com/codex/cli) |
+| `opencode` | `opencode` | [opencode.ai](https://opencode.ai) |
+| `pi` | `pi` | [badlogic/pi-mono](https://github.com/badlogic/pi-mono) |
+
+The external CLI must be installed and on `$PATH`. If the binary is not found, ghostgrid reports the error as JSON and exits 1.
 
 ## Video Monitoring
 
