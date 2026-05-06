@@ -67,6 +67,7 @@ src/ghostgrid/          # main package
   workflows/            # sequential, parallel, moa, react, iterative, conditional, monitoring
   tools/                # builtin ReAct tools + parsing helpers
   providers.py          # provider dispatch + run_agent
+  backends.py           # external agent backend dispatch (claude-code, codex, opencode, pi)
   models.py             # Agent, AgentResult, Tool, AlertEvent dataclasses
   config.py             # env/config helpers + system prompts
   cli.py                # argparse CLI
