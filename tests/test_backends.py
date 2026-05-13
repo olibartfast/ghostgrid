@@ -39,7 +39,7 @@ def test_open_backend_session_builds_correct_cmd(backend, prompt, expected_cmd):
     with patch("ghostgrid.backends.subprocess.run", return_value=_make_proc()) as mock_run:
         open_backend_session(backend, prompt)
 
-    mock_run.assert_called_once_with(expected_cmd, cwd=None, check=False)
+    mock_run.assert_called_once_with(expected_cmd, cwd=None, env=None, check=False)
 
 
 def test_open_backend_session_inherits_stdio():
@@ -63,6 +63,36 @@ def test_open_backend_session_passes_cwd():
 
     _, kwargs = mock_run.call_args
     assert kwargs["cwd"] == "/tmp/project"
+
+
+def test_open_backend_session_env_merges_over_parent(monkeypatch):
+    monkeypatch.setenv("PATH", "/usr/bin")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+    with patch("ghostgrid.backends.subprocess.run", return_value=_make_proc()) as mock_run:
+        open_backend_session("claude-code", "test", env={"ANTHROPIC_API_KEY": "sk-injected"})
+
+    _, kwargs = mock_run.call_args
+    assert kwargs["env"]["ANTHROPIC_API_KEY"] == "sk-injected"
+    assert kwargs["env"]["PATH"] == "/usr/bin"
+
+
+def test_open_backend_session_env_override_wins(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-parent")
+
+    with patch("ghostgrid.backends.subprocess.run", return_value=_make_proc()) as mock_run:
+        open_backend_session("claude-code", "test", env={"ANTHROPIC_API_KEY": "sk-override"})
+
+    _, kwargs = mock_run.call_args
+    assert kwargs["env"]["ANTHROPIC_API_KEY"] == "sk-override"
+
+
+def test_open_backend_session_no_env_inherits_parent():
+    with patch("ghostgrid.backends.subprocess.run", return_value=_make_proc()) as mock_run:
+        open_backend_session("pi", "test")
+
+    _, kwargs = mock_run.call_args
+    assert kwargs["env"] is None
 
 
 def test_cli_agent_backend_opens_session_and_exits(monkeypatch):
