@@ -20,6 +20,9 @@ Before editing any Python under src/ or tests/:
     Shared result-dict construction → ghostgrid/workflows/_utils.py
     Shared run_agent call signature → pass through **kwargs
   - Do NOT add docstrings/comments/types to code you did not change.
+  - **MANDATORY before every push: `act -j lint` must pass.**
+    Emulates the GitHub Actions lint job in Docker (pinned via .actrc).
+    Enforced by .claude/hooks/pre_push_ci_gate.sh.
 Playbook: .claude/skills/ci-guardian/SKILL.md
 </ghostgrid-ci-reminder>
 EOF

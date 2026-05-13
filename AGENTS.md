@@ -130,7 +130,8 @@ decay.
 ruff check src/ tests/ && \
 ruff format --check src/ tests/ && \
 pylint src/ghostgrid/ --fail-under=8.0 && \
-pytest tests/ -q -x
+pytest tests/ -q -x && \
+act -j lint
 ```
 
 If this is green locally, CI will be green. The `pre_push_ci_gate.sh` hook
@@ -138,3 +139,28 @@ runs exactly these commands.
 
 **Rule: always run the full gate command before every commit and push.**
 A push that skips local tests risks breaking CI for everyone. No exceptions.
+
+### Mandatory: `act` emulation before every push
+
+**Every push must be preceded by a successful `act -j lint` run.** This runs
+the GitHub Actions `lint` job inside the same container image CI uses
+(`catthehacker/ubuntu:act-latest`, pinned in `.actrc`). It catches the class
+of failures the direct ruff/pylint/pytest gate cannot see:
+
+- Workflow YAML syntax errors
+- `pip install -e ".[dev]"` regressions (dependency drift, missing extras)
+- Container-only failures (path/permission differences between host and CI)
+
+Requirements:
+
+- `act` ≥ 0.2.88 on `$PATH` (`https://github.com/nektos/act`)
+- A running Docker daemon
+
+Granular opt-outs (use only when justified, e.g. Docker unavailable on a
+laptop):
+
+- `GHOSTGRID_SKIP_ACT=1 git push …` — skip just the `act` stage
+- `GHOSTGRID_SKIP_CI_GATE=1 git push …` — skip the entire local gate
+- `git push --no-verify …` — bypass all PreToolUse hooks
+
+These opt-outs exist for emergencies. Routine pushes must run `act`.
