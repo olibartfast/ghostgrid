@@ -218,6 +218,36 @@ hatch build
 
 ---
 
+## §act — GitHub Actions emulation (mandatory pre-push)
+
+**Symptom.** Local gate green but CI red, *or* the pre-push hook fails at the
+`act -j lint` stage.
+
+**Rule.** Every push must run `act -j lint` successfully. This is enforced
+by `.claude/hooks/pre_push_ci_gate.sh` and is the only thing that catches:
+
+- Workflow YAML syntax errors
+- `pip install -e ".[dev]"` regressions (dependency drift, missing extras)
+- Container-only failures (path / permission deltas between host and CI)
+
+**Local reproduce.**
+```bash
+act -j lint
+```
+
+The runner image is pinned in `.actrc` to `catthehacker/ubuntu:act-latest`
+so behavior matches CI. Requires a running Docker daemon.
+
+**Opt-outs** (emergency only, never routine):
+
+- `GHOSTGRID_SKIP_ACT=1 git push …` — skip just the `act` stage
+- `GHOSTGRID_SKIP_CI_GATE=1 git push …` — skip the whole local gate
+
+If `act -j lint` fails locally, fix it before pushing. Pushing with
+`GHOSTGRID_SKIP_ACT=1` to dodge a real failure breaks CI for everyone.
+
+---
+
 ## Local CI gate — the one command to rule them all
 
 Before pushing, run:
@@ -227,6 +257,7 @@ ruff check src/ tests/ && \
 ruff format --check src/ tests/ && \
 pylint src/ghostgrid/ --fail-under=8.0 && \
 pytest tests/ -q -x && \
+act -j lint && \
 echo "OK — safe to push"
 ```
 

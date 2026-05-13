@@ -89,5 +89,30 @@ else
   echo "[pre_push_ci_gate] warning: pytest not installed, skipping test stage" >&2
 fi
 
+# Mandatory: emulate the GitHub Actions lint job locally with `act`. Catches
+# env/dependency drift the direct gate misses (workflow YAML errors, install
+# step regressions, container-only failures). Runs only the lint job to keep
+# the round-trip fast; the test matrix would take minutes per Python version.
+if [[ "${GHOSTGRID_SKIP_ACT:-}" == "1" ]]; then
+  echo "[pre_push_ci_gate] GHOSTGRID_SKIP_ACT=1; skipping act stage" >&2
+elif ! command -v act >/dev/null 2>&1; then
+  fail "act is required but not installed.
+
+Install: https://github.com/nektos/act#installation
+Or skip just this stage (not recommended): GHOSTGRID_SKIP_ACT=1 git push ..."
+elif ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
+  fail "act requires a running Docker daemon.
+
+Start Docker, or skip this stage (not recommended): GHOSTGRID_SKIP_ACT=1 git push ..."
+else
+  echo "[pre_push_ci_gate] running 'act -j lint' to emulate GitHub Actions..." >&2
+  if ! act_out="$(act -j lint --quiet 2>&1)"; then
+    fail "act -j lint failed — GitHub Actions would also fail:
+$act_out
+
+To skip just this stage (not recommended): GHOSTGRID_SKIP_ACT=1 git push ..."
+  fi
+fi
+
 echo "[pre_push_ci_gate] OK — local CI gate passed, allowing push" >&2
 exit 0
