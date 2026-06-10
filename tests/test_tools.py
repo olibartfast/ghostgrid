@@ -4,6 +4,7 @@ from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.tools import BUILTIN_TOOLS
 from ghostgrid.tools.builtin import (
     _tool_list_directory,
+    _tool_neuriplo_detect,
     _tool_read_file,
     _tool_run_bash,
     _tool_search_files,
@@ -195,3 +196,116 @@ def test_search_files_truncates_large_output(tmp_path, monkeypatch):
     monkeypatch.setattr(subprocess, "run", fake_run)
     result = _tool_search_files(_agent(), _cfg(), pattern="match", path=str(tmp_path))
     assert "truncated" in result
+
+
+# ---------------------------------------------------------------------------
+# neuriplo_detect
+# ---------------------------------------------------------------------------
+
+
+def _detect_cfg(tmp_path) -> InferenceConfig:
+    """Config with one real (tiny) image file so encode_image succeeds."""
+    from PIL import Image
+
+    img = tmp_path / "frame.jpg"
+    Image.new("RGB", (8, 8), color=(255, 0, 0)).save(img)
+    return InferenceConfig(image_paths=[str(img)], detail="low", max_tokens=256, resize=False, target_size=(512, 512))
+
+
+def test_neuriplo_detect_requires_endpoint_env(monkeypatch):
+    monkeypatch.delenv("NEURIPLO_DETECT_URL", raising=False)
+    result = _tool_neuriplo_detect(_agent(), _cfg())
+    assert result.startswith("ERROR:")
+    assert "NEURIPLO_DETECT_URL" in result
+
+
+def test_neuriplo_detect_requires_image(monkeypatch):
+    monkeypatch.setenv("NEURIPLO_DETECT_URL", "http://localhost:9000/detect")
+    result = _tool_neuriplo_detect(_agent(), _cfg())
+    assert result.startswith("ERROR:")
+    assert "image" in result
+
+
+def test_neuriplo_detect_returns_contract_detections(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEURIPLO_DETECT_URL", "http://localhost:9000/detect")
+    contract_body = {
+        "task": "object_detection",
+        "model": "yolov8n",
+        "image": {"width": 8, "height": 8},
+        "detections": [
+            {
+                "class_id": 0,
+                "label": "person",
+                "class_confidence": 0.93,
+                "bbox": {"x": 1, "y": 2, "width": 3, "height": 4},
+            }
+        ],
+    }
+    captured = {}
+
+    class FakeResponse:
+        status_code = 200
+        text = ""
+
+        def json(self):
+            return contract_body
+
+    def fake_post(url, json=None, timeout=None):
+        captured["url"] = url
+        captured["payload"] = json
+        return FakeResponse()
+
+    import ghostgrid.tools.builtin as builtin
+
+    monkeypatch.setattr(builtin.requests, "post", fake_post)
+    result = _tool_neuriplo_detect(_agent(), _detect_cfg(tmp_path), labels="person, dog", confidence="0.5")
+    assert result.startswith("1 detection(s) from yolov8n")
+    assert '"label": "person"' in result
+    assert captured["url"] == "http://localhost:9000/detect"
+    assert captured["payload"]["labels"] == ["person", "dog"]
+    assert captured["payload"]["confidence_threshold"] == 0.5
+    assert "image" in captured["payload"]
+
+
+def test_neuriplo_detect_rejects_bad_confidence(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEURIPLO_DETECT_URL", "http://localhost:9000/detect")
+    result = _tool_neuriplo_detect(_agent(), _detect_cfg(tmp_path), confidence="high")
+    assert result.startswith("ERROR:")
+    assert "confidence" in result
+
+
+def test_neuriplo_detect_http_error(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEURIPLO_DETECT_URL", "http://localhost:9000/detect")
+
+    class FakeResponse:
+        status_code = 503
+        text = "model not loaded"
+
+    import ghostgrid.tools.builtin as builtin
+
+    monkeypatch.setattr(builtin.requests, "post", lambda *a, **k: FakeResponse())
+    result = _tool_neuriplo_detect(_agent(), _detect_cfg(tmp_path))
+    assert result.startswith("ERROR:")
+    assert "503" in result
+
+
+def test_neuriplo_detect_missing_detections_key(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEURIPLO_DETECT_URL", "http://localhost:9000/detect")
+
+    class FakeResponse:
+        status_code = 200
+        text = ""
+
+        def json(self):
+            return {"unexpected": True}
+
+    import ghostgrid.tools.builtin as builtin
+
+    monkeypatch.setattr(builtin.requests, "post", lambda *a, **k: FakeResponse())
+    result = _tool_neuriplo_detect(_agent(), _detect_cfg(tmp_path))
+    assert result.startswith("ERROR:")
+    assert "detections" in result
+
+
+def test_builtin_tools_contains_neuriplo_detect():
+    assert "neuriplo_detect" in BUILTIN_TOOLS
