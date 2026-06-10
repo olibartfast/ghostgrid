@@ -2,10 +2,14 @@
 Built-in ReAct tools for vision analysis and code/filesystem operations.
 """
 
+import json
 import os
 import subprocess
 
+import requests
+
 from ghostgrid.config import CREDENTIAL_ENV_VARS
+from ghostgrid.image import encode_image
 from ghostgrid.models import Agent, InferenceConfig, Tool
 from ghostgrid.providers import run_agent
 
@@ -61,6 +65,48 @@ def _tool_count_objects(agent: Agent, config: InferenceConfig, **kwargs) -> str:
         config,
     )
     return result.content if result.success else f"ERROR: {result.error}"
+
+
+def _tool_neuriplo_detect(_agent: Agent, config: InferenceConfig, **kwargs) -> str:
+    """Run grounded object detection via a neuriplo detection endpoint.
+
+    Unlike detect_objects/count_objects (VLM prompts), this returns typed
+    detections from a real detector, serialized per the neuriplo result
+    contract: {"task", "model", "image", "detections": [{"label",
+    "class_confidence"|"score", "bbox": {"x", "y", "width", "height"}}]}.
+    """
+    url = os.environ.get("NEURIPLO_DETECT_URL")
+    if not url:
+        return "ERROR: NEURIPLO_DETECT_URL is not set; point it at a neuriplo detection endpoint."
+    if not config.image_paths:
+        return "ERROR: neuriplo_detect requires an image input (--images)."
+
+    payload: dict = {"image": encode_image(config.image_paths[0], config.resize, config.target_size)}
+    labels = kwargs.get("labels")
+    if labels:
+        payload["labels"] = [part.strip() for part in str(labels).split(",") if part.strip()]
+    confidence = kwargs.get("confidence")
+    if confidence is not None:
+        try:
+            payload["confidence_threshold"] = float(confidence)
+        except (TypeError, ValueError):
+            return "ERROR: 'confidence' must be a number."
+
+    try:
+        response = requests.post(url, json=payload, timeout=60)
+    except requests.exceptions.RequestException as exc:
+        return f"ERROR: {exc}"
+    if response.status_code != 200:
+        return f"ERROR: detection endpoint returned {response.status_code}: {response.text[:200]}"
+    try:
+        result = response.json()
+    except ValueError:
+        return "ERROR: detection endpoint returned non-JSON output."
+    detections = result.get("detections")
+    if not isinstance(detections, list):
+        return "ERROR: response has no 'detections' list (expected neuriplo serialized result contract)."
+    header = f"{len(detections)} detection(s) from {result.get('model', 'unknown model')}"
+    return f"{header}\n{json.dumps(detections, indent=2)}"
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +256,19 @@ BUILTIN_TOOLS: dict[str, Tool] = {
         description="Count occurrences of a specific object in the image(s).",
         parameters='{"object": "name of the object to count"}',
         fn=_tool_count_objects,
+    ),
+    "neuriplo_detect": Tool(
+        name="neuriplo_detect",
+        description=(
+            "Detect objects with a neuriplo grounded detection endpoint; returns typed bounding "
+            "boxes and confidence scores from a real detector instead of VLM estimates. "
+            "Requires the NEURIPLO_DETECT_URL environment variable."
+        ),
+        parameters=(
+            '{"labels": "optional comma-separated class names or open-vocabulary prompts",'
+            ' "confidence": "optional minimum confidence threshold (float)"}'
+        ),
+        fn=_tool_neuriplo_detect,
     ),
     "read_file": Tool(
         name="read_file",

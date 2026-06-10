@@ -105,6 +105,7 @@ The `react` workflow exposes a registry of tools the agent can invoke at each st
 | `read_text` | Extract all visible text (OCR) from the image(s) |
 | `analyze_region` | Focus analysis on a described spatial region |
 | `count_objects` | Count occurrences of a named object |
+| `neuriplo_detect` | Grounded object detection via a [neuriplo](https://github.com/olibartfast/neuriplo-platform) detection endpoint — typed boxes and scores from a real detector, not VLM estimates. Requires `NEURIPLO_DETECT_URL`; supports optional `labels` (open-vocabulary prompts) and `confidence` parameters |
 
 ### Code-agent / filesystem tools
 
