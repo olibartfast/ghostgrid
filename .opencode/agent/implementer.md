@@ -1,7 +1,7 @@
 ---
 description: Implements one delegated packet against named paths. Cheap hosted worker.
 mode: subagent
-model: nvidia/nvidia/nemotron-3.5-lightning-30b-a3b
+model: deepinfra/zai-org/GLM-5.3-Flash
 temperature: 0
 steps: 12
 permission:
