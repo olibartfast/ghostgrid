@@ -3,9 +3,11 @@
 import logging
 import os
 import subprocess
+import time
 from collections.abc import Callable
 
 from ghostgrid.config import CREDENTIAL_ENV_VARS
+from ghostgrid.models import BackendAdapter, BackendResult
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,39 @@ def sanitize_env(extra_env: dict[str, str] | None = None) -> dict[str, str]:
     return env
 
 
+def _run_subprocess_backend(
+    cmd_builder: Callable[[str | None], list[str]],
+    prompt: str | None,
+    cwd: str | None,
+    env: dict[str, str] | None,
+) -> BackendResult:
+    """Run one external coding-agent CLI and capture the outcome."""
+    start = time.time()
+    result = subprocess.run(cmd_builder(prompt), cwd=cwd, env=env, check=False)
+    return BackendResult(
+        content="",
+        error=None,
+        exit_code=result.returncode,
+        latency_ms=(time.time() - start) * 1000,
+        tool_events=[],
+        structured=False,
+    )
+
+
+def _subprocess_backend_adapter(backend: str, cmd_builder: Callable[[str | None], list[str]]) -> BackendAdapter:
+    """Build an exit-code-only subprocess adapter for a backend."""
+    return BackendAdapter(
+        name=backend,
+        supports_structured=False,
+        run=lambda prompt, cwd=None, env=None: _run_subprocess_backend(cmd_builder, prompt, cwd, env),
+    )
+
+
+BACKEND_ADAPTERS: dict[str, BackendAdapter] = {
+    backend: _subprocess_backend_adapter(backend, cmd_builder) for backend, cmd_builder in _BACKEND_CMDS.items()
+}
+
+
 def open_backend_session(
     backend: str,
     prompt: str | None = None,
@@ -46,5 +81,5 @@ def open_backend_session(
         raise ValueError(f"Unknown agent backend: {backend!r}")
     merged_env = sanitize_env(env) if sanitize else ({**os.environ, **env} if env else None)
     logger.info("Launching %s backend session", backend)
-    result = subprocess.run(_BACKEND_CMDS[backend](prompt), cwd=cwd, env=merged_env, check=False)
-    return result.returncode
+    result = BACKEND_ADAPTERS[backend].run(prompt, cwd=cwd, env=merged_env)
+    return result.exit_code

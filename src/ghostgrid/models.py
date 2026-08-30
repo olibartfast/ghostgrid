@@ -55,3 +55,24 @@ class Tool:
     description: str
     parameters: str  # JSON schema hint shown to the agent
     fn: Callable  # fn(agent, config: InferenceConfig, **kwargs) -> str
+
+
+@dataclass
+class BackendResult:
+    """Structured result from an external coding-agent backend adapter."""
+
+    content: str
+    error: str | None
+    exit_code: int | None
+    latency_ms: float
+    tool_events: list[dict]
+    structured: bool
+
+
+@dataclass
+class BackendAdapter:
+    """Dispatch contract for an external coding-agent backend."""
+
+    name: str
+    supports_structured: bool
+    run: Callable[[str | None, str | None, dict[str, str] | None], BackendResult]

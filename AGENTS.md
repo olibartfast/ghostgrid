@@ -76,6 +76,11 @@ examples/               # runnable example scripts
 docs/                   # markdown documentation
 ```
 
+### External agent backends (routing decision)
+
+See `specs/tech-stack.md` (boundaries + routing decision) and `docs/backend-adapters.md`
+(contract + rationale).
+
 ---
 
 ## CI
