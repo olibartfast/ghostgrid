@@ -58,6 +58,43 @@ class Tool:
 
 
 @dataclass
+class DecisionQuestion:
+    """One typed question for a System One decision model."""
+
+    name: str
+    type: str  # "choice" | "score" | "noul"
+    instructions: str
+    criteria: dict[str, str | None] | list[str] | None = None
+
+
+@dataclass
+class DecisionAnswer:
+    """A decision model's answer to one question."""
+
+    name: str
+    type: str
+    value: str | float  # chosen option (choice), expected level (score), or P(yes) (noul)
+    probabilities: dict[str, float]
+    confidence: float | None = None
+
+
+@dataclass
+class DecisionResult:
+    """Result of one System One request."""
+
+    model: str | None
+    answers: dict[str, DecisionAnswer]
+    latency_ms: float
+    raw_response: dict
+    input_tokens: int | None = None
+    error: str | None = None
+
+    @property
+    def success(self) -> bool:
+        return self.error is None
+
+
+@dataclass
 class BackendResult:
     """Structured result from an external coding-agent backend adapter."""
 

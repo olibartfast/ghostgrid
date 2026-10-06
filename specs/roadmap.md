@@ -60,6 +60,36 @@ structured backend can join `parallel`/`moa`/`react` via the `AgentResult` mappi
 interactive handoff when `supports_structured=False`. Reuse `_result_to_dict` in
 `workflows/_utils.py` as the single place a result becomes a JSON dict — do not fork it.
 
+## Next — decision models (in progress)
+
+Source of truth: `docs/decision-models.md`. Goal: let ghostgrid ask small typed questions
+(`choice`, `score`, `noul`) of a decision model over the System One `/v1/systemone` API, served
+by `llama-server`, `laya-serve`, or hosted Jev. Each phase carries the two standing CI
+constraints.
+
+### Phase D1 — Decision client and `decide` CLI
+
+Status: **in progress** → `specs/2026-10-06-systemone-decision-client/`
+
+`decisions.py`, decision dataclasses in `models.py`, and `ghostgrid decide`. No runtime
+dependency added; reuses `_request_with_retry`. `SYSTEMONE_API_KEY` joins `CREDENTIAL_ENV_VARS`.
+No workflow behavior changes.
+
+### Phase D2 — Opt-in shell gate
+
+Status: **not started** — blocked on measured cutoffs from `agentic-ai-playground`
+`benchmarks/decision-v1`.
+
+Ask an `allow`/`ask`/`deny` question before each `run_bash` command when the user opts in with a
+model and a cutoff. Refuse on `deny`, on `ask`, and below the cutoff.
+
+### Phase D3 — Decision router for `conditional`
+
+Status: **not started**
+
+Let the `conditional` workflow route with a `choice` question instead of a chat-model router,
+mapping categories to options with descriptions.
+
 ## Deferred
 
 - Anything not listed above is deferred until a roadmap phase names it. A new runtime dependency,

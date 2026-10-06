@@ -178,6 +178,24 @@ ghostgrid run --agent-backend pi
 
 The external CLI must be installed and on `$PATH`. If the binary is not found, ghostgrid reports the error as JSON and exits 1.
 
+## Decision Models
+
+`ghostgrid decide` asks a decision model typed questions about a state over the System One
+`/v1/systemone` API. A decision model returns a probability for each option you supply, from one
+forward pass and with no generated text. The same command reaches `llama-server`, `laya-serve`,
+or TypeSafe's hosted Jev by changing `--url`.
+
+```bash
+llama-server -hf ggml-org/Julia-1-GGUF --host 127.0.0.1 --port 8080
+
+ghostgrid decide --state "Proposed shell command: rm -rf ~/.ssh" \
+    --questions examples/decision_questions.json
+```
+
+Questions use the API's own shape: `choice` (named options, ideally with descriptions), `score`
+(2 to 10 ordered levels), or `noul` (yes/no). See [docs/decision-models.md](docs/decision-models.md).
+Decisions are not yet wired into any workflow; that is roadmap Phase D2.
+
 ## Supported Providers
 
 | Provider | `--provider` | API Key Env Var | Notes |
@@ -274,6 +292,7 @@ print(result["content"])
 
 - [API Services](docs/api-services.md) — LLM and multimodal API providers
 - [Benchmarks](docs/benchmarks.md) — LLM, VLM, and video evaluation references
+- [Decision Models](docs/decision-models.md) — System One `/v1/systemone` client and `ghostgrid decide`
 - [Inference](docs/inference.md) — Inference frameworks and tools
 
 ## License

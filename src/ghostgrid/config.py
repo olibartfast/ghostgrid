@@ -41,8 +41,13 @@ WORKFLOW_CHOICES = ["sequential", "parallel", "conditional", "iterative", "moa",
 # Tools available in code-agent mode
 CODE_AGENT_TOOLS = ["read_file", "write_file", "list_directory", "run_bash", "search_files"]
 
+# System One decision-model endpoint (llama-server, laya-serve, or hosted Jev)
+SYSTEMONE_URL_ENV = "SYSTEMONE_URL"
+SYSTEMONE_API_KEY_ENV = "SYSTEMONE_API_KEY"
+DEFAULT_SYSTEMONE_URL = "http://127.0.0.1:8080"
+
 # Environment variable names that contain credentials — redacted from subprocess environments
-CREDENTIAL_ENV_VARS: set[str] = set(PROVIDER_ENV_MAP.values())
+CREDENTIAL_ENV_VARS: set[str] = set(PROVIDER_ENV_MAP.values()) | {SYSTEMONE_API_KEY_ENV}
 
 # ---------------------------------------------------------------------------
 # ReAct system prompt template
