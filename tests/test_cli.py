@@ -7,6 +7,7 @@ import pytest
 
 from ghostgrid import cli
 from ghostgrid.cli import build_agents, main
+from ghostgrid.models import DecisionAnswer, DecisionResult
 
 
 def test_build_agents_uses_provider_specific_default_endpoints(monkeypatch):
@@ -216,3 +217,101 @@ def test_main_allows_text_only_run(monkeypatch, capsys):
     output = json.loads(capsys.readouterr().out)
     assert output["content"] == "ok"
     assert output["image_paths"] == []
+
+
+# ---------------------------------------------------------------------------
+# decide subcommand
+# ---------------------------------------------------------------------------
+
+
+def _decide_questions(tmp_path):
+    path = tmp_path / "questions.json"
+    path.write_text(
+        json.dumps(
+            {
+                "gate": {
+                    "type": "choice",
+                    "instructions": "Should the agent run this command?",
+                    "criteria": {"allow": "safe", "ask": "risky", "deny": "destructive"},
+                }
+            }
+        )
+    )
+    return str(path)
+
+
+def test_cli_decide_prints_answers(monkeypatch, capsys, tmp_path):
+    calls = {}
+
+    def fake_run_decision(state, questions, **kwargs):
+        calls.update(state=state, names=[q.name for q in questions], **kwargs)
+        return DecisionResult(
+            model="ggml-org/Julia-1-GGUF",
+            answers={"gate": DecisionAnswer("gate", "choice", "deny", {"deny": 0.9}, 0.85)},
+            latency_ms=12.3,
+            raw_response={},
+            input_tokens=40,
+        )
+
+    monkeypatch.setattr(cli, "run_decision", fake_run_decision)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["ghostgrid", "decide", "--state", "rm -rf ~/.ssh", "-q", _decide_questions(tmp_path), "-m", "julia"],
+    )
+
+    cli.main()
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["answers"]["gate"]["value"] == "deny"
+    assert output["success"] is True
+    assert calls["state"] == "rm -rf ~/.ssh"
+    assert calls["names"] == ["gate"]
+    assert calls["model"] == "julia"
+
+
+def test_cli_decide_parses_json_state_file(monkeypatch, capsys, tmp_path):
+    state_file = tmp_path / "state.json"
+    state_file.write_text('{"command": "ls"}')
+    seen = {}
+
+    def fake_run_decision(state, _questions, **_kwargs):
+        seen["state"] = state
+        return DecisionResult(model=None, answers={}, latency_ms=1.0, raw_response={})
+
+    monkeypatch.setattr(cli, "run_decision", fake_run_decision)
+    monkeypatch.setattr(
+        sys, "argv", ["ghostgrid", "decide", "--state-file", str(state_file), "-q", _decide_questions(tmp_path)]
+    )
+
+    cli.main()
+
+    assert seen["state"] == {"command": "ls"}
+    capsys.readouterr()
+
+
+def test_cli_decide_exits_nonzero_on_error(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr(
+        cli,
+        "run_decision",
+        lambda *_a, **_k: DecisionResult(model=None, answers={}, latency_ms=1.0, raw_response={}, error="refused"),
+    )
+    monkeypatch.setattr(sys, "argv", ["ghostgrid", "decide", "--state", "s", "-q", _decide_questions(tmp_path)])
+
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+
+    assert exc.value.code == 1
+    assert json.loads(capsys.readouterr().out)["error"] == "refused"
+
+
+def test_cli_decide_rejects_invalid_questions(monkeypatch, capsys, tmp_path):
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps({"q": {"type": "score", "instructions": "x", "criteria": ["only"]}}))
+    monkeypatch.setattr(sys, "argv", ["ghostgrid", "decide", "--state", "s", "-q", str(bad)])
+
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+
+    assert exc.value.code == 1
+    assert "2 to 10 levels" in json.loads(capsys.readouterr().out)["error"]
