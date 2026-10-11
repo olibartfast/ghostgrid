@@ -12,9 +12,12 @@ from ghostgrid.config import (
     CODE_AGENT_SYSTEM_PROMPT,
     CODE_AGENT_TOOLS,
     DEFAULT_ENDPOINT,
+    DEFAULT_SYSTEMONE_URL,
     PROVIDER_ENV_MAP,
+    SYSTEMONE_URL_ENV,
     resolve_endpoint,
 )
+from ghostgrid.decisions import decision_result_to_dict, load_questions, run_decision
 from ghostgrid.models import Agent, InferenceConfig
 from ghostgrid.tools import BUILTIN_TOOLS
 from ghostgrid.workflows import (
@@ -254,6 +257,73 @@ def _build_run_parser(subparsers) -> None:
     run_parser.set_defaults(func=cmd_run)
 
 
+def _read_state(args) -> object:
+    """Return the decision state from --state or --state-file; JSON files are parsed."""
+    if args.state is not None:
+        return args.state
+    with open(args.state_file, encoding="utf-8") as handle:
+        text = handle.read()
+    if args.state_file.endswith(".json"):
+        return json.loads(text)
+    return text
+
+
+def cmd_decide(args) -> None:
+    """Handle the 'decide' subcommand: ask a System One decision model typed questions."""
+    _setup_logging(args)
+    correlation_id = str(uuid.uuid4())[:12]
+    try:
+        result = run_decision(
+            _read_state(args),
+            load_questions(args.questions),
+            url=args.url,
+            model=args.model,
+            images=args.images or None,
+            timeout=args.timeout,
+        )
+    except (OSError, ValueError) as exc:
+        print(json.dumps({"error": str(exc), "correlation_id": correlation_id}, indent=2))
+        sys.exit(1)
+    output = decision_result_to_dict(result)
+    output["correlation_id"] = correlation_id
+    print(json.dumps(output, indent=2))
+    if not result.success:
+        sys.exit(1)
+
+
+def _build_decide_parser(subparsers) -> None:
+    """Register the 'decide' subcommand."""
+    decide_parser = subparsers.add_parser(
+        "decide", help="Ask a decision model typed questions over the System One /v1/systemone API"
+    )
+    state_group = decide_parser.add_mutually_exclusive_group(required=True)
+    state_group.add_argument("--state", type=str, help="State text to decide about")
+    state_group.add_argument("--state-file", type=str, help="Read the state from a file (.json files are parsed)")
+    decide_parser.add_argument(
+        "--questions",
+        "-q",
+        type=str,
+        required=True,
+        help="JSON file mapping question names to {type, instructions, criteria}",
+    )
+    decide_parser.add_argument(
+        "--url",
+        "-u",
+        type=str,
+        default=None,
+        help=f"Server base URL or full endpoint (default: ${SYSTEMONE_URL_ENV} or {DEFAULT_SYSTEMONE_URL})",
+    )
+    decide_parser.add_argument("--model", "-m", type=str, default=None, help="Model id (router-mode servers)")
+    decide_parser.add_argument(
+        "--images", "-i", type=str, nargs="*", default=[], help="Image paths or URLs (image-capable models only)"
+    )
+    decide_parser.add_argument("--timeout", type=int, default=60, help="Request timeout in seconds")
+    decide_parser.add_argument(
+        "--log-level", type=str, default="WARNING", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
+    )
+    decide_parser.set_defaults(func=cmd_decide)
+
+
 def main() -> None:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -265,6 +335,7 @@ def main() -> None:
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     _build_run_parser(subparsers)
+    _build_decide_parser(subparsers)
 
     args = parser.parse_args()
 
