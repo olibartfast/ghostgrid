@@ -34,9 +34,20 @@ env, sanitize)` keeps its exact signature and behavior; `tests/test_backends.py`
 unchanged. Extract the per-backend command builder and env handling into shared helpers so the
 four backend branches do not repeat ≥ 6 similar lines (R0801).
 
+### Phase 2a — Model-API capture adapter (structured, all backends)
+
+Status: **spec drafted** → `specs/2026-10-06-backend-capture-proxy/`
+
+Point each backend CLI at a local stdlib recording proxy (base URL + per-session token) and build a
+structured `BackendResult` from the recorded model calls, without a per-vendor protocol layer. Pass-
+through for Anthropic Messages, OpenAI Responses and Chat Completions; no new runtime dependency.
+The proxy holds the real key, the subprocess only a session token. `pi` stays subprocess-only until
+its config dir can be overridden. If this lands, Phases 2 and 3 are re-evaluated rather than built
+by default.
+
 ### Phase 2 — ACP adapter for `opencode` (structured)
 
-Status: **not started**
+Status: **not started** (re-evaluate after Phase 2a)
 
 Add `agent-client-protocol` to `dependencies`; implement a `supports_structured=True` adapter for
 `opencode` only, speaking JSON-RPC over stdio. Map content/tool events into `BackendResult`.
